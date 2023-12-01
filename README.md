@@ -30,7 +30,7 @@ This project is a first public commit on my new version of LRO. LRO is a project
 To check demo version [click here.](https://lro-new-demo.netlify.app) Basic controls below.
  - Click on character on map to activate it. Click to any other place on the map to trigger moving.
  - Move mouse pointer to any of the sides of the map. Hold shift to trigger map scrolling. Add left Alt to boost scrolling.
- - Type anything on the chat input. Press enter to public message. You'll se placeholder message based on your input.
+ - Type anything on the chat input. Press enter to public message. You'll see placeholder message based on your input.
  - Add some dices to roll with the button at the right side on the chat input. You can also write roll order manually with # /dices and constants/ and optionally another # /roll comment/. Examples:
 	 1. #d20 - roll 20-sided dice,
 	 2. #d20 + 5 - roll 20-sided dice and add 5 to the result,

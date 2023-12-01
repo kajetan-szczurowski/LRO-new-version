@@ -1,4 +1,4 @@
-# LRO new version - FrontEnd
+# LRO new version - Frontend
 
 This project is a first public commit on my new version of LRO. LRO is a project made for playing tabletop RPG with my friends online. *Link to demo at the bottom of the description.*
 

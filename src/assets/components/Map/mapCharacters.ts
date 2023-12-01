@@ -11,7 +11,6 @@ export function handleCharacters(map:mapType){
 }
 
 export function isMouseOnCharacter(map:mapType, character:characterType){
-    console.log(map.absoluteMouseX, character.x, character.size)
     if(!character || !character.size) return;
     const [x, y, lowX, lowY, bigX, bigY] = [map.absoluteMouseX, map.absoluteMouseY, character.x, character.y, character.x + character.size, character.y + character.size];
     return x >= lowX && y >= lowY && x <= bigX && y <= bigY;

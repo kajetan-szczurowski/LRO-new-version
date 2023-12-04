@@ -2,6 +2,7 @@ import { getDefaultMap, mapType, mapPresets, characterType } from "./mapTypes";
 import * as drawing from "./mapDrawing"
 import * as controls from "./mapControls"
 import * as characters from "./mapCharacters"
+import * as mapMath from "./mapMath"
 
 export function processMap(canvasId : string, presets:mapPresets, charactersArray: characterType[], controllFunction: Function, interval : number = 50){
 
@@ -18,6 +19,7 @@ export function processMap(canvasId : string, presets:mapPresets, charactersArra
                 requestAnimationFrame(() => drawing.drawAll(mapData));
                 mapData.toBeRedrawn = false;
         }
+
 
     }, interval)
 
@@ -40,7 +42,8 @@ function performMapLogic(map: mapType, charactersSource: characterType[]){
     checkForCharacters(map,charactersSource);
     characters.handleCharacters(map);
     checkForRedrawning(map);
-
+    controls.miniMapControl(map);
+    controls.handleMeasure(map);
     return map;
 }
 
@@ -75,6 +78,7 @@ function calculateCanvasSize(map: mapType){
         map.rawCanvas.width = maxWidth;
         map.rawCanvas.height = maxHeight;
         map.toBeRedrawn = true;
+        calculateTextsSizes(map); //For placeholder
         return;
     }
    
@@ -83,6 +87,41 @@ function calculateCanvasSize(map: mapType){
     map.rawCanvas.width = map.visibleWidth;
     map.rawCanvas.height = map.visibleHeight;
     map.toBeRedrawn = true;
+    calculateMiniMapGeometry(map);
+    calculateTextsSizes(map);
+}
+
+function calculateMiniMapGeometry(map:mapType){
+    if (!map.presets.MINI_MAP_WIDTH_PERCENT || !map.presets.MINI_MAP_HEIGHT_PERCENT) return;
+    if (!map.presets.MINI_MAP_RIGHT_MARGIN_PERCENT || !map.presets.MINI_MAP_BOTTOM_MARGIN_PERCENT) return;
+    if (!map.img || !map.presets.MINI_MAP_BORDER_THICKNESS) return;
+    const maxWidth = map.rawCanvas.width * map.presets.MINI_MAP_WIDTH_PERCENT / 100;
+    const maxHeight = map.rawCanvas.height * map.presets.MINI_MAP_HEIGHT_PERCENT / 100;
+    const marginRight = map.rawCanvas.width * map.presets.MINI_MAP_RIGHT_MARGIN_PERCENT / 100;
+    const marginBottom = map.rawCanvas.height * map.presets.MINI_MAP_BOTTOM_MARGIN_PERCENT / 100;
+    const ratio = map.img.width / map.img.height;
+    
+    const canvasWidth = ratio >= 1? maxWidth : maxHeight * ratio;
+    const canvasHeight = ratio >= 1? maxWidth / ratio : maxHeight;
+    map.miniMapBorderX = map.rawCanvas.width - marginRight - canvasWidth;
+    map.miniMapBorderY = map.rawCanvas.height - marginBottom - canvasHeight;
+    map.miniMapX = map.miniMapBorderX + map.presets.MINI_MAP_BORDER_THICKNESS / 2;
+    map.miniMapY = map.miniMapBorderY + map.presets.MINI_MAP_BORDER_THICKNESS / 2;
+    map.miniMapWidth = canvasWidth - map.presets.MINI_MAP_BORDER_THICKNESS;
+    map.miniMapHeight = canvasHeight - map.presets.MINI_MAP_BORDER_THICKNESS;
+    map.miniMapPointerWidth = map.rawCanvas.width / map.img.width * map.miniMapWidth;
+    map.miniMapPointerHeight = map.rawCanvas.height / map.img.height * map.miniMapHeight;
+    map.miniMapCurrentX = map.miniMapX + map.x / map.img.width * map.miniMapWidth;
+    map.miniMapCurrentY = map.miniMapY + map.y / map.img.height * map.miniMapHeight;
+
+}
+
+function calculateTextsSizes(map:mapType){
+    const diagonal = mapMath.hypotenuseFromPitagoras(map.rawCanvas.width, map.rawCanvas.height);
+    const measureFontSize = diagonal * map.presets.DISTANCE_FONT_SIZE_PERCENT / 100;
+    const placeholderFontSize = diagonal * map.presets.PLACEHOLDER_TEXT_SIZE_PERCENT / 100;
+    map.measureFont = `${measureFontSize}px ${map.presets.DISTANCE_FONT}`;
+    map.placeholderFont = `${placeholderFontSize}px ${map.presets.PLACEHOLDER_FONT}`;
 }
 
 function checkForRedrawning(map: mapType){

@@ -33,7 +33,7 @@ export default function RollsFamily({data, filtered, rolledDictionary}: props) {
         <div className='character-box-clickable' onClick={handleChunkClick}>
             <strong>{rollData.name}</strong>
             <> </>
-            <NumericAndTextSpans value={rollData.value} digitsClass='numeric-value' nonDigitsClass='main-text non-numeric-value'/>
+            <NumericAndTextSpans value={rollData.value} digitsClass='numeric-value' nonDigitsClass='non-numeric-value'/>
         </div>
     )
 

@@ -1,3 +1,4 @@
+import {useId} from 'react';
 
 export default function NumericAndTextSpans({value, digitsClass, nonDigitsClass}: props) {
     const compiled = compileText();
@@ -5,7 +6,7 @@ export default function NumericAndTextSpans({value, digitsClass, nonDigitsClass}
     <> 
         {compiled.map(chunk => {
             const className = chunk.numeric? digitsClass : nonDigitsClass;
-            return(<span className={className}>{chunk.value}</span>)
+            return(<span className={className} key = {useId()}>{chunk.value}</span>)
         })}
     </>
   )

@@ -48,7 +48,32 @@ export type mapType = assetType & {
     controllFunction: Function,
     activeAssetId?: string,
     absoluteMouseX: number,
-    absoluteMouseY: number
+    absoluteMouseY: number,
+    miniMapWidth?: number,
+    miniMapHeight?: number,
+    miniMapBorderX?: number,
+    miniMapBorderY?: number,
+    miniMapX?: number,
+    miniMapY?: number,
+    miniMapPointerWidth?: number,
+    miniMapPointerHeight?: number,
+    miniMapPointerX? :number,
+    miniMapPointerY? :number,
+    miniMapAimedX?: number,
+    miniMapAimedY?: number,
+    miniMapCurrentX?: number,
+    miniMapCurrentY?: number,
+    mouseOnMiniMap?: boolean,
+    measuring: boolean,
+    measurePoint: {x: number, y: number},
+    distance: {meters: string, feets:string},
+    measureFont: string,
+    measureLineWidth: number,
+    measureRadius: number,
+    showMiniMap? :boolean,
+    allowHideMiniMap? :boolean,
+    placeholderFont: string,
+
 }
 
 export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: HTMLCanvasElement, presets:mapPresets, externalFunction: Function){
@@ -79,7 +104,16 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         activeSide: 0,
         controllFunction: externalFunction,
         absoluteMouseX: 0,
-        absoluteMouseY: 0
+        absoluteMouseY: 0,
+        measuring: false,
+        measurePoint: {x:0, y:0},
+        distance: {meters:'', feets:''},
+        measureFont: '30px Fondamento',
+        measureLineWidth: 5,
+        measureRadius: 0,
+        showMiniMap: true,
+        allowHideMiniMap: true,
+        placeholderFont: '30px Fondamento'
         
     }
 
@@ -91,10 +125,10 @@ export type mapPresets = {
     PRIMARY_SCROLL_KEY : string,
     SECONDARY_SCROLL_KEY : string,
     DISABLE_MINI_MAP_KEY : string,     
-    START_MEASURE_KEY: string,
-    STOP_MEASURE_KEY: string,
-    MINI_MAP_HEIGHT_PERCENT: number,
-    MINI_MAP_WIDTH_PERCENT: number,
+    START_MEASURE_KEY: string, //lowerCase!!!
+    STOP_MEASURE_KEY: string,   //lowerCase!!!
+    MINI_MAP_HEIGHT_PERCENT?: number,
+    MINI_MAP_WIDTH_PERCENT?: number,
     MAP_WIDTH_PERCENT: number,
     MAP_HEIGHT_PERCENT: number,
     MAP_BORDER_LENGTH: number,
@@ -110,10 +144,27 @@ export type mapPresets = {
     ASSET_ACTIVE_LINE_WIDTH: number,
     ASSET_ACTIVE_SHADOW_FILL_STYLE: string,
     PLACEHOLDER_TEXT : string,
+    DISTANCE_TEXT_SIZE_PERCENT: number,
     PLAHOLDER_FILL_STYLE : string,
     PLACEHOLDER_TEXT_ALIGNMENT: 'start' | 'end' | 'center' | 'left' | 'right',
-    PLACEHOLDER_FONT: string
-
+    PLACEHOLDER_FONT: string,
+    PLACEHOLDER_TEXT_SIZE_PERCENT: number,
+    MINI_MAP_RIGHT_MARGIN_PERCENT?: number,
+    MINI_MAP_BOTTOM_MARGIN_PERCENT?: number,
+    MINI_MAP_BORDER_THICKNESS?: number,
+    MINI_MAP_BORDER_STROKE_STYLE? :string,
+    MINI_MAP_POINTER_FILL_STYLE? : string,
+    MINI_MAP_PREVIEW_STROKE_STYLE? :string,
+    MINI_MAP_PREVIEW_LINE_WIDTH?: number,
+    FEET_DISTANCE_MULTIPLIER: number,
+    DISTANCE_FONT: string,
+    DISTANCE_FONT_SIZE_PERCENT: number,
+    DISTANCE_LINE_COLOR: string,
+    DISTANCE_CIRCLE_FILL_STYLE: string,
+    DISTANCE_LINE_WIDTH_PERCENT: number,
+    DISTANCE_FONT_FILL_STYLE: string,
+    DISTANCE_FONT_STROKE_STYLE: string,
+    MINI_MAP_HIDE_FILTER_TIME?: number
 }
 
 export function getMainMapPresets(){
@@ -125,25 +176,45 @@ export function getMainMapPresets(){
         DISABLE_MINI_MAP_KEY : 'Control',
         START_MEASURE_KEY: 'r',
         STOP_MEASURE_KEY: 't',
-        MINI_MAP_HEIGHT_PERCENT: 30,
-        MINI_MAP_WIDTH_PERCENT: 30,
+        MINI_MAP_HEIGHT_PERCENT: 20,
+        MINI_MAP_WIDTH_PERCENT: 20,
         MAP_WIDTH_PERCENT: 55,
         MAP_HEIGHT_PERCENT: 60,
         MAP_BORDER_LENGTH: 100,
-        SCROLLING_SPEED: 5,
-        SCROLLING_BOOSTER: 15,
+        SCROLLING_SPEED: 20,
+        SCROLLING_BOOSTER: 30,
         SCROLL_MOUSE_POSITION_THRESHOLD: 0.1,
         POSITION_X_ON_CANVAS: 0,
         POSITION_Y_ON_CANVAS: 0,
         MAP_BORDER_COLOR: 'gray',
         BORDER_GRAPHIC_URL: '',
-        ASSET_ACTIVE_STROKE_STYLE: 'red',
+        ASSET_ACTIVE_STROKE_STYLE: 'blue',
         ASSET_ACTIVE_LINE_WIDTH: 3,
         ASSET_ACTIVE_SHADOW_FILL_STYLE: 'gray',
         PLACEHOLDER_TEXT: 'Map is loading...',
         PLAHOLDER_FILL_STYLE: 'white',
+        PLACEHOLDER_TEXT_SIZE_PERCENT: 10,
         PLACEHOLDER_TEXT_ALIGNMENT: 'center',
-        PLACEHOLDER_FONT: '30px Fondamento'
+        PLACEHOLDER_FONT: 'Fondamento',
+        DISTANCE_TEXT_SIZE_PERCENT: 5,
+        MINI_MAP_RIGHT_MARGIN_PERCENT: 5,
+        MINI_MAP_BOTTOM_MARGIN_PERCENT: 5,
+        MINI_MAP_BORDER_THICKNESS: 4,
+        MINI_MAP_BORDER_STROKE_STYLE: 'black',
+        MINI_MAP_POINTER_FILL_STYLE: 'gray',
+        MINI_MAP_PREVIEW_STROKE_STYLE: 'red',
+        MINI_MAP_PREVIEW_LINE_WIDTH: 2,
+        FEET_DISTANCE_MULTIPLIER: 5,
+        DISTANCE_FONT: 'Fondamento',
+        DISTANCE_FONT_SIZE_PERCENT: 3,
+        DISTANCE_LINE_COLOR: 'white',
+        DISTANCE_CIRCLE_FILL_STYLE: 'rgba(80, 80, 80, 0.5)',
+        DISTANCE_LINE_WIDTH_PERCENT: 10,
+        DISTANCE_FONT_FILL_STYLE: 'white',
+        DISTANCE_FONT_STROKE_STYLE: 'black',
+        MINI_MAP_HIDE_FILTER_TIME: 500
+
+
     }
     
     return returned;

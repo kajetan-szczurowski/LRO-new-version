@@ -30,7 +30,7 @@ This project is a first public commit on my new version of LRO. LRO is a project
  
 To check demo version [click here.](https://lro-new-demo.netlify.app) Basic controls below.
  - Click on character on map to activate it. Click to any other place on the map to trigger moving.
- - You'll see measure calibrated for my RPG game. You can also trigger measure manually by pressing 'r' key. To disable meaure press 't'.
+ - You'll see measure calibrated for my RPG game. You can also trigger measure manually by pressing 'r' key. To disable measure press 't'.
  - When a character is able to move (blue stroke) click anywhere on the map right mouse button. Character becomes deactivated.
  - When mouse is on the map press left Ctrl for changing visibility of the mini map. 
  - Move mouse pointer to any of the sides of the map. Hold shift to trigger map scrolling. Add left add to boost scrolling.

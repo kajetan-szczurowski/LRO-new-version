@@ -13,6 +13,7 @@ import Combat from './Combat';
 import { triggerSettingsWindow } from './Settings';
 import { usersDataState } from '../../states/GlobalState';
 import { useSocket } from '../../providers/SocketProvider';
+import EditAttributeDialog from './Editables/EditAttributeDialog';
 
 const chosenCharacterStorageKey = 'lets-roll-one-chosenID';
 const charactersMapStorageKey = 'lets-roll-one-charactersMap';
@@ -78,6 +79,7 @@ export default function CharacterBox() {
     // <charactersContext.Provider value={cData}>
       <section id = 'character-box' >
         <CharacterEditDialog/>
+        {/* <EditAttributeDialog/> */}
         <div id = 'login-bar'>
           <AuxilaryCharacterButton onClickEvent={triggerSettingsWindow} label = 'gear' />
           <AuxilaryCharacterButton onClickEvent={handleRefresh} label = 'refresh' />
@@ -227,10 +229,10 @@ function getPlaceholderData():characterDataType{
 }
 
 export async function downloadCharacterData(id: string, state: Signal<characterDataType[]>){
-  console.log('siema?')
+  // console.log('siema?')
   try{
-    // const data = await fetch(`http://localhost:3000/character/${id}`);
-    const data = await fetch(`https://lro-2-alpha-backend-production.up.railway.app/character/${id}`);
+    const data = await fetch(`http://localhost:3000/character/${id}`);
+    // const data = await fetch(`https://lro-2-alpha-backend-production.up.railway.app/character/${id}`);
     // console.log(data)
     console.log(`pobieram ${id}`)
     const jsoned = await data.json();

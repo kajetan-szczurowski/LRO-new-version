@@ -1,16 +1,26 @@
-import {SyntheticEvent} from 'react'
-import {signal, useComputed} from '@preact/signals-react';
-import { messages } from './Chat';
+import {SyntheticEvent, useRef} from 'react'
+import {signal, useComputed, useSignal} from '@preact/signals-react';
+import { useSocket } from '../../providers/SocketProvider';
+import { InputListWithLimit } from '../../dataTypes/chatHistory';
+import { characterNameSignal } from '../CharacterBox/CharacterBox';
 
 export const chatInputSignal = signal({modifier: '', description: ''});
 
-
 export default function ChatInput() {
+  const historyKey = 'lets-roll-one-chat-input-history';
+  const SESSION_STORAGE_LOGIN_ID_KEY = 'LRO-logged-user-ID';
+  const inputHistoryLimit = 20;
+  const socket = useSocket();
   const textInput = useComputed(compileChatSignal);
+  // const chatHistory = useLocalStorageSignal(historyKey, new InputListWithLimit<string>(inputHistoryLimit));
+  const chatHistory = useSignal(new InputListWithLimit(inputHistoryLimit, historyKey));
+
+  const inputRef = useRef<HTMLInputElement>(null);
   prepareInput(textInput.value);
+  document.onkeydown = keyEvent;
   return (
-    <form onSubmit={handleSubmit}>
-      <input name = 'chatInput'  type= 'text' className = 'main-text' id = {'input-area'} />
+    <form onSubmit={handleSubmit} >
+      <input name = 'chatInput'  type= 'text' className = 'main-text' id = {'input-area'} ref = {inputRef} autoComplete="off" maxLength={150}/>
     </form>
 
   )
@@ -19,27 +29,33 @@ export default function ChatInput() {
     e.preventDefault();
     const target = e.target as typeof e.target & {chatInput: {value: string}};
     const chatValue = target.chatInput.value;
-    if (chatValue == '') return; 
+    if (chatValue == '') return;
+    if (socket) socket.emit('chat-message', {value: chatValue, sender: characterNameSignal.value, userID : sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY)}); 
+    if (chatValue !== chatHistory.value.getIthFromEnd(0)) chatHistory.value.push(chatValue);
+    // chatHistory.value.printList();
     //TODO: move To BackEnd
-    messages.value = [...messages.value, prepMessage(chatValue)];
+    // messages.value = [...messages.value, prepMessage(chatValue)];
     chatInputSignal.value = {description: '', modifier: ''};
+    target.chatInput.value = '';
+    // resetHistoryIndex();
   }
 
-  function prepMessage(message: string){
-    //Placeholder - this will be on back end
-    const id = Date.now() + Math.random();
-    if (!message.includes('#')) return{id: id, messageTypeName : "message", text: message, sender: 'Awesome Person'};
-    const trimmed = message.trim();
-    if (trimmed.charAt(0) !== '#') return {id: id, messageTypeName : "system", text: 'Something is off with your input'}
-    const rollOrders = trimmed.substring(1, trimmed.length).split('#');
-    const sender = 'Awesome Person'
-    const rawOrder = rollOrders[0].trim();
-    const result = String(Math.ceil(Math.random() * 42));
-    const text = `d20 + ${Math.floor(Math.random()*10)}`;
-    if (rollOrders.length > 1) return {id:id, messageTypeName: 'roll', sender:sender, rawOrder: rawOrder, result:result, text: text, comment: rollOrders[1].trim()}
-    return {id:id, messageTypeName: 'roll', sender:sender, rawOrder: rawOrder, result:result, text: text}
+  function keyEvent(e: KeyboardEvent){
+    if (!inputRef.current) return;
+    if (inputRef.current !== document.activeElement) return;
 
+    if (e.key === 'ArrowUp') chatHistory.value.moveCurrentBack();
+    else if (e.key === 'ArrowDown') chatHistory.value.moveCurrentForward();
+    else return;
+
+    e.preventDefault();
+
+    // const fromHistory = chatHistory.value.getIthFromEnd(chatHistoryIndex.current);
+    const fromHistory = chatHistory.value.getCurrent();
+    if (!fromHistory) return;
+    inputRef.current.value = fromHistory;
   }
+
 
 
   function prepareInput(newInputText: string){
@@ -161,4 +177,6 @@ export default function ChatInput() {
     }
     return reversed;
   }
+
+
 }

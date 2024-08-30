@@ -1,5 +1,6 @@
 import { mapType } from "./mapTypes"
 import { isMouseOnCharacter } from "./mapCharacters";
+import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
 
 export function canvasEventListeners(map: mapType){
@@ -95,6 +96,12 @@ function handleContextMenu(e:MouseEvent, map:mapType){
         map.activeSide = 0;
         stopMeasuring(map);
     }
+
+    for(let i = map.assets.length - 1; i >= 0; i--){
+        if (isMouseOnCharacter(map, map.assets[i])){
+            map.controllFunction('delete-asset', [map.assets[i].id]);
+        }
+    }
 }
 
 
@@ -178,7 +185,7 @@ function handleClick(map: mapType){
     }
 
     if (map.activeSide && map.activeAssetId){
-        map.controllFunction('move-order', [map.activeAssetId, map.absoluteMouseX - map.activeSide / 2, map.absoluteMouseY - map.activeSide / 2]);
+        map.controllFunction('move-order-output', [map.activeAssetId, map.absoluteMouseX - map.activeSide / 2, map.absoluteMouseY - map.activeSide / 2]);
         const activeElement = map.assets.find(char => char.id === map.activeAssetId);
         if (!activeElement) return;
         activeElement.active = false;
@@ -254,14 +261,19 @@ function scrollMap(map:mapType, shift:number, axis: "x" | "y", increasing:boolea
 function moveMap(map: mapType, x:number, y:number){
     map.x = x;
     map.y = y;
-    if (map.img && map.miniMapWidth && map.miniMapX) map.miniMapCurrentX = map.miniMapX + Math.max(map.x,0) / map.img.width * map.miniMapWidth;
-    if (map.img && map.miniMapHeight && map.miniMapY) map.miniMapCurrentY = map.miniMapY + Math.max(map.y,0) / map.img.height * map.miniMapHeight;
+    // if (map.img && map.miniMapWidth && map.miniMapX) map.miniMapCurrentX = map.miniMapX + Math.max(map.x,0) / map.img.width * map.miniMapWidth;
+    // if (map.img && map.miniMapHeight && map.miniMapY) map.miniMapCurrentY = map.miniMapY + Math.max(map.y,0) / map.img.height * map.miniMapHeight;
+    // if (map.miniMapPointerX && map.miniMapWidth && map.miniMapX && map.miniMapPointerWidth && map.miniMapCurrentX) console.log(map.miniMapPointerWidth + map.miniMapCurrentX, 
+    //     map.miniMapX + map.miniMapWidth);
+    
     map.toBeRedrawn = true;
     handleMapBorderLogic(map);
     calculateMeasure(map);
+    mapDataState.value.x = x;
+    mapDataState.value.y = y;
 }
 
-function limitValue(value: number, min: number, max: number){
+export function limitValue(value: number, min: number, max: number){
     if (value < min) return min;
     if (value > max) return max;
     return value;

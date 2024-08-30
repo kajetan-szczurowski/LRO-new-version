@@ -2,7 +2,7 @@ import {useState} from 'react'
 import { characterElementType } from '../../types/characterTypes';
 import { chatInputSignal } from '../Chat/ChatInput';
 import NumericAndTextSpans from '../NumericAndTextSpans';
-
+import { characterEditSignal } from './CharacterEditDialog';
 
 export default function RollsFamily({data, filtered, rolledDictionary}: props) {
   const fromDictionary = data[0].family? rolledDictionary[data[0].family] : true;
@@ -30,7 +30,7 @@ export default function RollsFamily({data, filtered, rolledDictionary}: props) {
 
   function RollChunk({rollData}: chunkType){
     return(
-        <div className='character-box-clickable' onClick={handleChunkClick}>
+        <div className='character-box-clickable' onClick={handleChunkClick} onContextMenu = {handleChunkRightMouseClick}>
             <strong>{rollData.name}</strong>
             <> </>
             <NumericAndTextSpans value={rollData.value} digitsClass='numeric-value' nonDigitsClass='non-numeric-value'/>
@@ -41,8 +41,14 @@ export default function RollsFamily({data, filtered, rolledDictionary}: props) {
         chatInputSignal.value = {modifier: String(rollData.value), description: String(rollData.name)};
       }
 
+      function handleChunkRightMouseClick(e: React.MouseEvent){
+        e.preventDefault();
+        characterEditSignal.value = {currentValue: rollData.value, name: rollData.name, family: rollData.family};
+      }
+    }
+
   }
-}
+
 
 type props = {
     data: characterElementType[],

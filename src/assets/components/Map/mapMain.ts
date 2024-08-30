@@ -3,8 +3,10 @@ import * as drawing from "./mapDrawing"
 import * as controls from "./mapControls"
 import * as characters from "./mapCharacters"
 import * as mapMath from "./mapMath"
+import { Socket } from "socket.io-client";
+import { limitValue } from "./mapControls";
 
-export function processMap(canvasId : string, presets:mapPresets, charactersArray: characterType[], controllFunction: Function, interval : number = 50){
+export function processMap(canvasId : string, presets:mapPresets, charactersArray: characterType[], controllFunction: Function, socket:Socket, interval : number = 50){
 
     Object.freeze(presets);
     let mapData: mapType;
@@ -30,6 +32,7 @@ export function processMap(canvasId : string, presets:mapPresets, charactersArra
         if (!canvas) return;
         mapData = getDefaultMap(canvas, canvasObject, presets, controllFunction);
         controls.canvasEventListeners(mapData);
+        socket.on('map-control', (parameters) => {mapData.controllFunction(parameters.controlWord, parameters.args, mapData)});
     }
 
 }
@@ -103,6 +106,9 @@ function calculateMiniMapGeometry(map:mapType){
     
     const canvasWidth = ratio >= 1? maxWidth : maxHeight * ratio;
     const canvasHeight = ratio >= 1? maxWidth / ratio : maxHeight;
+    const mapX = limitValue(map.x, 0, map.img.width - map.rawCanvas.width);
+    const mapY = limitValue(map.y, 0, map.img.height - map.rawCanvas.height);
+
     map.miniMapBorderX = map.rawCanvas.width - marginRight - canvasWidth;
     map.miniMapBorderY = map.rawCanvas.height - marginBottom - canvasHeight;
     map.miniMapX = map.miniMapBorderX + map.presets.MINI_MAP_BORDER_THICKNESS / 2;
@@ -111,9 +117,8 @@ function calculateMiniMapGeometry(map:mapType){
     map.miniMapHeight = canvasHeight - map.presets.MINI_MAP_BORDER_THICKNESS;
     map.miniMapPointerWidth = map.rawCanvas.width / map.img.width * map.miniMapWidth;
     map.miniMapPointerHeight = map.rawCanvas.height / map.img.height * map.miniMapHeight;
-    map.miniMapCurrentX = map.miniMapX + map.x / map.img.width * map.miniMapWidth;
-    map.miniMapCurrentY = map.miniMapY + map.y / map.img.height * map.miniMapHeight;
-
+    map.miniMapCurrentX = map.miniMapX + mapX / map.img.width * map.miniMapWidth;
+    map.miniMapCurrentY = map.miniMapY + mapY / map.img.height * map.miniMapHeight;
 }
 
 function calculateTextsSizes(map:mapType){

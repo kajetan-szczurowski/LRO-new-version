@@ -1,13 +1,20 @@
 import { characterType, mapType } from "./mapTypes";
 import { loadImage } from "./mapMain";
-import * as geometry from "./mapMath"
+import * as geometry from "./mapMath";
+import { stepSounds } from "../CharacterBox/Settings";
 
 export function handleCharacters(map:mapType){
+    let noCharasterIsMoving = true;
     map.assets.forEach(character => {
         if (!character.img) loadImage(character);
         handleCharacterVisibility(character, map);
-        if (checkForMoving(character)) handleMove(character, map);
+        if (checkForMoving(character)) {
+            handleMove(character, map);
+            stepsSoundPlay();
+            noCharasterIsMoving = false;
+        }
     })
+    if (noCharasterIsMoving) stepsSoundStop();
 }
 
 export function isMouseOnCharacter(map:mapType, character:characterType){
@@ -16,9 +23,20 @@ export function isMouseOnCharacter(map:mapType, character:characterType){
     return x >= lowX && y >= lowY && x <= bigX && y <= bigY;
 }
 
+function stepsSoundPlay(){
+    if (!stepSounds.value) return;
+    const stepsAudio: HTMLAudioElement | null = document.querySelector('.steps-audio');
+    if (stepsAudio) stepsAudio.play();
+}
+
+function stepsSoundStop(){
+    const stepsAudio: HTMLAudioElement | null = document.querySelector('.steps-audio');
+    if (stepsAudio) stepsAudio.pause();
+}
+
 function handleCharacterVisibility(asset: characterType, map: mapType){
     if(!asset.sourceWidth || !asset.sourceHeight) return;
-    asset.size = map.presets.ASSET_SIZE;
+    if (!asset.size) asset.size = map.presets.ASSET_SIZE;
     const lowX = asset.x + asset.size >= map.x;
     const lowY = asset.y + asset.size >= map.y;
     const bigX = asset.x <= map.x + map.visibleWidth;

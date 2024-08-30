@@ -11,7 +11,8 @@ export type assetType = {
     sourceHeight?: number,
     currentGraphicUrl?: string,
     isVisible? : boolean,
-    isDrawn? : boolean
+    isDrawn? : boolean,
+    name: string
 
 }
 
@@ -88,7 +89,7 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         sourceHeight: 0,
         visibleWidth: 0,
         visibleHeight: 0,
-        graphicUrl: 'https://drive.google.com/uc?id=1ct4LpheQOGqZQo7KD5MmVl33AXlBiDuI',
+        graphicUrl: 'https://s13.gifyu.com/images/S0Irz.jpg',
         currentGraphicUrl: '',
         toBeRedrawn: true,
         presets: presets,
@@ -108,12 +109,13 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         measuring: false,
         measurePoint: {x:0, y:0},
         distance: {meters:'', feets:''},
-        measureFont: '30px Fondamento',
+        measureFont: '30px Laila',
         measureLineWidth: 5,
         measureRadius: 0,
         showMiniMap: true,
         allowHideMiniMap: true,
-        placeholderFont: '30px Fondamento'
+        placeholderFont: '30px Fondamento',
+        name: 'placeholder-name'
         
     }
 
@@ -205,7 +207,7 @@ export function getMainMapPresets(){
         MINI_MAP_PREVIEW_STROKE_STYLE: 'red',
         MINI_MAP_PREVIEW_LINE_WIDTH: 2,
         FEET_DISTANCE_MULTIPLIER: 5,
-        DISTANCE_FONT: 'Fondamento',
+        DISTANCE_FONT: 'Laila',
         DISTANCE_FONT_SIZE_PERCENT: 3,
         DISTANCE_LINE_COLOR: 'white',
         DISTANCE_CIRCLE_FILL_STYLE: 'rgba(80, 80, 80, 0.5)',

@@ -1,6 +1,7 @@
 import { characterElementType, aboutCharacterType } from '../../types/characterTypes'
 import ListWithHeader from './ListWithHeader'
 import { characterData } from './CharacterBox';
+import EditableAttribute from './Editables/EditableAttribute';
 
 export default function About() {
   const aboutData = characterData.value?.about;
@@ -15,7 +16,7 @@ export default function About() {
         <div className = 'about-text'>
           <h1>{characterData.value?.name}</h1>
             {/* <ListWithHeader data = {aboutData?.generalInfo.length? aboutData.generalInfo : []} attributeGroup = 'generalInfo'/> */}
-            {aboutData?.generalInfo.length && <ListDisplayer/>}
+            {aboutData?.generalInfo.length && <ListDisplayer data = {aboutData?.generalInfo}/>}
 
           <strong>Traits</strong>
           <> </>
@@ -27,8 +28,10 @@ export default function About() {
       <div className = 'about-auxilary'>
         <h2>Difficulty Classes</h2>
         {/* <ListWithHeader  data = {aboutData.DCs} attributeGroup = 'DCs'/> */}
+        {aboutData?.DCs.length && <ListDisplayer data = {aboutData.DCs} />}
         <h2>Ability Scores</h2>
         {/* <ListWithHeader  data = {aboutData.abilities} attributeGroup = 'abilities'/> */}
+        {aboutData?.abilities.length && <ListDisplayer data = {aboutData.abilities} />}
       </div>
 
     </div>
@@ -42,13 +45,28 @@ export default function About() {
     return input.length === 0;
   }
 
-  function ListDisplayer(){
-    console.log('witam')
+  function ListDisplayer({data}: listDisplayerProps){
     return(
-      <>{aboutData?.generalInfo.map(input => {return(<>{String(input)}</>)})}</>
+      <ul>
+        {data.map(input => {
+          const containLetters = /[a-zA-Z]+/g.test(String(input.value));
+          // return(<>{String(input)}</>)})}
+          return(
+            <li>
+              <strong><EditableAttribute title = {input.name} text = {input.name} maxLength={100} /></strong> 
+              {!containLetters && <em className = 'numeric-value'><EditableAttribute title = {input.name} text = {String(input.value)} maxLength={600} /></em>}
+              {containLetters && <em><EditableAttribute title = {input.name} text = {String(input.value)} maxLength={600} /></em>}
+            </li>
+          )})}
+
+      </ul>
     )
   }
 
+}
+
+type listDisplayerProps = {
+  data : characterElementType[]
 }
 
 

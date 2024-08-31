@@ -79,7 +79,7 @@ export default function CharacterBox() {
     // <charactersContext.Provider value={cData}>
       <section id = 'character-box' >
         <CharacterEditDialog/>
-        {/* <EditAttributeDialog/> */}
+        <EditAttributeDialog/>
         <div id = 'login-bar'>
           <AuxilaryCharacterButton onClickEvent={triggerSettingsWindow} label = 'gear' />
           <AuxilaryCharacterButton onClickEvent={handleRefresh} label = 'refresh' />

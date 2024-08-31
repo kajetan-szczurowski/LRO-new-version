@@ -43,7 +43,8 @@ export default function EditAttributeDialog() {
                 <div className = 'closing-button-box closing-dialog-edit'>
                     <button onClick = {handleCloseClick}>&times;</button>
                 </div>
-                
+
+            <div className = 'dialog-wrapper'>
                 <h2>{editSignal.value.title || ''} </h2>
 
             <div className='edit-dialog-inside' ref = {primaryDivRef}>
@@ -51,10 +52,10 @@ export default function EditAttributeDialog() {
                     {newItem && <label htmlFor='attribute-input'>Label</label>}
                     <input name = 'attribute-input' ref = {oneLinerRef} type = 'text' id = 'atr-edit-input' className= {inputClass} maxLength={maxLength}/>
                     {newItem && <label htmlFor='attribute-text-area'>Description</label>}
-                    <textarea name = 'attribute-text-area' ref = {multiLinerRef} id = 'atr-edit-text-area' className = {textAreaClass} maxLength = {maxLength} />
+                    {/* <textarea name = 'attribute-text-area' ref = {multiLinerRef} id = 'atr-edit-text-area' className = {textAreaClass} maxLength = {maxLength} /> */}
                     <div className = 'edit-dialog-buttons'>
                         <input type = 'submit' className = {`${submitClass} `} value='submit'/>
-                        <button className={`delete-button ${deleteButtonExtraClass}`} style={deleteSButtonStyle} onClick = {showDeleteQuestion}>{'Delete'}</button>
+                        {/* <button className={`delete-button ${deleteButtonExtraClass}`} style={deleteSButtonStyle} onClick = {showDeleteQuestion}>{'Delete'}</button> */}
 
                     </div>
                 </form>
@@ -69,6 +70,7 @@ export default function EditAttributeDialog() {
                 </div>
             </div>
             </div>
+            </div> 
         </dialog>
     )
 
@@ -97,16 +99,16 @@ export default function EditAttributeDialog() {
             if (editSignal.value.title === TITLE_ON_MOUNT_VALUE) return;
             if (!dialogRef.current) return;
             if (!oneLinerRef.current) return;
-            if (!multiLinerRef.current) return;
+            // if (!multiLinerRef.current) return;
             const isMultiline = editSignal.value.multiline;
-            if (isMultiline) multiLinerRef.current.value = editSignal.value.text;
-            else oneLinerRef.current.value = editSignal.value.text;
-            if (newItem) multiLinerRef.current.value = '';
+            // if (isMultiline) multiLinerRef.current.value = editSignal.value.text;
+            oneLinerRef.current.value = editSignal.value.text;
+            // if (newItem) multiLinerRef.current.value = '';
             if (newItem) oneLinerRef.current.value = '';
             if (dialogRef.current.open) return;
             dialogRef.current.showModal();
-            if (isMultiline) multiLinerRef.current.select();
-            else oneLinerRef.current.select();
+            // if (isMultiline) multiLinerRef.current.select();
+            oneLinerRef.current.select();
             });
     }
 
@@ -114,10 +116,10 @@ export default function EditAttributeDialog() {
         e.preventDefault();
         if (!dialogRef.current) return;
         if (!oneLinerRef.current) return;
-        if (!multiLinerRef.current) return;
+        // if (!multiLinerRef.current) return;
         dialogRef.current.close();
-        const isMultiline = editSignal.value.multiline;
-        const content = isMultiline? multiLinerRef.current.value : oneLinerRef.current.value;
+        // const isMultiline = editSignal.value.multiline;
+        const content = oneLinerRef.current.value;
         const payload = getEmitPayload(content);
         if (payload.value.length > maxLength) return;
         const socketOrder = newItem? 'new-character-attribute': 'edit-character-attribute';  

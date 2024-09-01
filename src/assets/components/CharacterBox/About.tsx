@@ -16,7 +16,7 @@ export default function About() {
         <div className = 'about-text'>
           <h1>{characterData.value?.name}</h1>
             {/* <ListWithHeader data = {aboutData?.generalInfo.length? aboutData.generalInfo : []} attributeGroup = 'generalInfo'/> */}
-            {aboutData?.generalInfo.length && <ListDisplayer data = {aboutData?.generalInfo}/>}
+            {aboutData?.generalInfo.length && <ListDisplayer data = {aboutData?.generalInfo} group = 'generalInfo'/>}
 
           <strong>Traits</strong>
           <> </>
@@ -28,10 +28,10 @@ export default function About() {
       <div className = 'about-auxilary'>
         <h2>Difficulty Classes</h2>
         {/* <ListWithHeader  data = {aboutData.DCs} attributeGroup = 'DCs'/> */}
-        {aboutData?.DCs.length && <ListDisplayer data = {aboutData.DCs} />}
+        {aboutData?.DCs.length && <ListDisplayer data = {aboutData.DCs} group = 'DCs'/>}
         <h2>Ability Scores</h2>
         {/* <ListWithHeader  data = {aboutData.abilities} attributeGroup = 'abilities'/> */}
-        {aboutData?.abilities.length && <ListDisplayer data = {aboutData.abilities} />}
+        {aboutData?.abilities.length && <ListDisplayer data = {aboutData.abilities} group = 'abilities' />}
       </div>
 
     </div>
@@ -45,17 +45,20 @@ export default function About() {
     return input.length === 0;
   }
 
-  function ListDisplayer({data}: listDisplayerProps){
+  function ListDisplayer({data, group}: listDisplayerProps){
+    let index = -1;
     return(
       <ul>
         {data.map(input => {
           const containLetters = /[a-zA-Z]+/g.test(String(input.value));
+          index++;
+          const payload = {attributeID: String(index), attributesGroup: group};
           // return(<>{String(input)}</>)})}
           return(
             <li>
-              <strong><EditableAttribute title = {input.name} text = {input.name} maxLength={100} /></strong> 
-              {!containLetters && <em className = 'numeric-value'><EditableAttribute title = {input.name} text = {String(input.value)} maxLength={600} /></em>}
-              {containLetters && <em><EditableAttribute title = {input.name} text = {String(input.value)} maxLength={600} /></em>}
+              <strong><EditableAttribute title = {input.name} text = {input.name} maxLength={100} {...payload} attributeSection='name'/></strong> 
+              {!containLetters && <em className = 'numeric-value'><EditableAttribute title = {input.name} text = {String(input.value)} maxLength={100} attributeSection='value' {...payload} /></em>}
+              {containLetters && <em><EditableAttribute title = {input.name} text = {String(input.value)} maxLength={100} {...payload} attributeSection='value' /></em>}
             </li>
           )})}
 
@@ -66,7 +69,8 @@ export default function About() {
 }
 
 type listDisplayerProps = {
-  data : characterElementType[]
+  data : characterElementType[],
+  group : string,
 }
 
 

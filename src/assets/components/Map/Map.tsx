@@ -2,6 +2,8 @@ import { processMap } from "./mapMain"
 import { getMainMapPresets, characterType } from "./mapTypes";
 import { useSocket } from "../../providers/SocketProvider";
 import { mapType } from "./mapTypes";
+import * as geometry from "./mapMath";
+
 
 
 const characters: characterType[] = [];
@@ -57,5 +59,20 @@ export default function Map() {
       }
     }
   }
+
+}
+
+
+function TEMP_mapDevelopement(){
+  //Delete after development
+
+  //developing alghoritm for shortening movement if exceeds characters speed
+  const startPoint = {x: 50, y: 50};
+  const points = [{x: 10, y: 10}, {x: 10, y: 50}, {x: 100, y: 10}, {x: 100, y: 50}, {x: 100, y: 100}, {x: 50, y: 100},
+    {x: 10, y: 100}, {x: 50, y: 10}];
+
+  const distances = points.map(onePoint => geometry.euclideanDistance(onePoint.x, onePoint.y, startPoint.x, startPoint.y));
+  const minimalDistance = Math.min(...distances);
+
 
 }

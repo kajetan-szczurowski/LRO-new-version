@@ -10,6 +10,7 @@ const characters: characterType[] = [];
 
 
 export default function Map() {
+  TEMP_mapDevelopement();
   const socket = useSocket();
   const mainID = 'main-map';
   const SESSION_STORAGE_LOGIN_ID_KEY = 'LRO-logged-user-ID';
@@ -73,6 +74,28 @@ function TEMP_mapDevelopement(){
 
   const distances = points.map(onePoint => geometry.euclideanDistance(onePoint.x, onePoint.y, startPoint.x, startPoint.y));
   const minimalDistance = Math.min(...distances);
+  const targetDistance = minimalDistance - 1;
+  // console.log(distances, minimalDistance, targetDistance)
+  points.forEach(onePoint => {
+    const newValue = TEMP_calculateNewPosition(startPoint, onePoint, targetDistance);
+    console.log(`coming to ${onePoint.x}, ${onePoint.y}. Ended at ${newValue.x}, ${newValue.y}`)})
 
+  }
 
-}
+  function TEMP_calculateNewPosition(point1: pointType, point2: pointType, maxDistance: number) : pointType{
+    const distance = geometry.euclideanDistance(point1.x, point1.y, point2.x, point2.y);
+    if (distance <= maxDistance) return point2;
+    const difference = {x: point2.x - point1.x, y: point2.y - point1.y};
+    const angle = Math.asin(difference.x / distance);
+    const degrees = angle * 180 / Math.PI;
+    console.log(`coming to ${point2.x}, ${point2.y}. Angle is ${degrees}`);
+    const limitedDifference = {x: maxDistance * Math.sin(angle), y: maxDistance * Math.cos(angle)};
+    const newPoint = {x: point1.x + limitedDifference.x, y: point1.y + limitedDifference.y};
+    return newPoint;
+
+  }
+
+  type pointType = {
+    x: number,
+    y: number
+  }

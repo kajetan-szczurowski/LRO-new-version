@@ -10,11 +10,11 @@ const characters: characterType[] = [];
 
 
 export default function Map() {
-  TEMP_mapDevelopement();
   const socket = useSocket();
   const mainID = 'main-map';
   const SESSION_STORAGE_LOGIN_ID_KEY = 'LRO-logged-user-ID';
-  setTimeout(() => {socket.emit('send-me-assets')}, 1000)
+  setTimeout(() => {socket.emit('send-me-assets')}, 1000);
+  setTimeout(() => {mapDeveloping();}, 1000);
 
 
   processMap(mainID, getMainMapPresets(), characters, mapExternalControl, socket)
@@ -61,6 +61,10 @@ export default function Map() {
     }
   }
 
+}
+
+function mapDeveloping(){
+  TEMP_mapDevelopement();
 }
 
 

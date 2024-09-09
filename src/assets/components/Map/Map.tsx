@@ -64,6 +64,9 @@ export default function Map() {
 }
 
 function mapDeveloping(){
+  const testCharacter: characterType = {x: 50, y: 50, name: 'Andrzej', graphicUrl: 'https://s12.gifyu.com/images/SYsHt.png', id: '2137'};
+  characters.push(testCharacter);
+  setTimeout(() => {testCharacter.aimedX = 300; testCharacter.aimedY = 300}, 1000)
   TEMP_mapDevelopement();
 }
 

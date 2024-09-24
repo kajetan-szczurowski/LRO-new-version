@@ -26,7 +26,8 @@ export default function Map() {
     switch(controlWord){
       case 'move-order-output':{
         const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
-        socket.emit('move-proposition', {id: args[0], x: args[1], y: args[2], userID: loggedUserID});
+        const newPoint = movePropositionMiddleware(args[0], args[1], args[2], mapData);
+        socket.emit('move-proposition', {id: args[0], x: newPoint.x, y: newPoint.y, userID: loggedUserID});
         return;
       }
 
@@ -63,41 +64,58 @@ export default function Map() {
 
 }
 
+function movePropositionMiddleware(characterID: string, newX: number, newY: number,  mapData: mapType): {x: number, y: number, id: string} | any {
+  if (!mapData.distanceOverflowing) return {x:newX, y: newY, id: characterID};
+  const character = mapData.assets.find(char => char.id === characterID);
+  if (!character) return {x:newX, y: newY, id: characterID};
+  if (!character.speed) return {x:newX, y: newY, id: characterID};
+  const limitedPosition = calculateLimitedPosition( {x: character.x, y: character.y}, {x: newX, y: newY}, character.speed, mapData);
+  return {x: limitedPosition.x, y: limitedPosition.y, id: characterID};
+
+}
+
 function mapDeveloping(){
-  const testCharacter: characterType = {x: 50, y: 50, name: 'Andrzej', graphicUrl: 'https://s12.gifyu.com/images/SYsHt.png', id: '2137'};
+  const testCharacter: characterType = {x: 50, y: 50, name: 'Andrzej', graphicUrl: 'https://s12.gifyu.com/images/SYsHt.png', id: '2137', speed: 15};
   characters.push(testCharacter);
   setTimeout(() => {testCharacter.aimedX = 300; testCharacter.aimedY = 300}, 1000)
-  TEMP_mapDevelopement();
+  // TEMP_mapDevelopement();
 }
 
 
-function TEMP_mapDevelopement(){
+// function TEMP_mapDevelopement(){
   //Delete after development
 
   //developing alghoritm for shortening movement if exceeds characters speed
-  const startPoint = {x: 50, y: 50};
-  const points = [{x: 10, y: 10}, {x: 10, y: 50}, {x: 100, y: 10}, {x: 100, y: 50}, {x: 100, y: 100}, {x: 50, y: 100},
-    {x: 10, y: 100}, {x: 50, y: 10}];
+  // const startPoint = {x: 50, y: 50};
+  // const points = [{x: 10, y: 10}, {x: 10, y: 50}, {x: 100, y: 10}, {x: 100, y: 50}, {x: 100, y: 100}, {x: 50, y: 100},
+  //   {x: 10, y: 100}, {x: 50, y: 10}];
 
-  const distances = points.map(onePoint => geometry.euclideanDistance(onePoint.x, onePoint.y, startPoint.x, startPoint.y));
-  const minimalDistance = Math.min(...distances);
-  const targetDistance = minimalDistance - 1;
+  // const distances = points.map(onePoint => geometry.euclideanDistance(onePoint.x, onePoint.y, startPoint.x, startPoint.y));
+  // const minimalDistance = Math.min(...distances);
+  // const targetDistance = minimalDistance - 1;
+  // console.log('distance: ', targetDistance)
   // console.log(distances, minimalDistance, targetDistance)
-  points.forEach(onePoint => {
-    const newValue = TEMP_calculateNewPosition(startPoint, onePoint, targetDistance);
-    console.log(`coming to ${onePoint.x}, ${onePoint.y}. Ended at ${newValue.x}, ${newValue.y}`)})
+  // points.forEach(onePoint => {
+    // const newValue = TEMP_calculateNewPosition(startPoint, onePoint, targetDistance);
+    // const printDistance = geometry.euclideanDistance(onePoint.x, onePoint.y, newValue.x, newValue.y);
+    // console.log(`coming to ${onePoint.x}, ${onePoint.y}. Ended at ${newValue.x}, ${newValue.y}. Distance: ${printDistance}`)})
 
-  }
+  // }
 
-  function TEMP_calculateNewPosition(point1: pointType, point2: pointType, maxDistance: number) : pointType{
+  function calculateLimitedPosition(point1: pointType, point2: pointType, maxDistanceFeets: number, mapData: mapType) : pointType{ //TODO: move into mapControls
     const distance = geometry.euclideanDistance(point1.x, point1.y, point2.x, point2.y);
+    const maxDistance = maxDistanceFeets / mapData.presets.FEET_DISTANCE_MULTIPLIER * mapData.presets.ASSET_SIZE;
+    // console.log('maxDistance: ' maxDistance)
     if (distance <= maxDistance) return point2;
-    const difference = {x: point2.x - point1.x, y: point2.y - point1.y};
-    const angle = Math.asin(difference.x / distance);
-    const degrees = angle * 180 / Math.PI;
-    console.log(`coming to ${point2.x}, ${point2.y}. Angle is ${degrees}`);
+    const difference = {x: Math.abs(point2.x - point1.x), y: Math.abs(point2.y - point1.y)};
+    const angle = Math.abs(Math.asin(difference.x / distance));
+    // const degrees = angle * 180 / Math.PI;
+    // console.log(`coming to ${point2.x}, ${point2.y}. Angle is ${degrees}`);
     const limitedDifference = {x: maxDistance * Math.sin(angle), y: maxDistance * Math.cos(angle)};
-    const newPoint = {x: point1.x + limitedDifference.x, y: point1.y + limitedDifference.y};
+    const newX = (point2.x > point1.x) ? point1.x + limitedDifference.x: point1.x - limitedDifference.x;
+    const newY = (point2.y > point1.y) ? point1.y + limitedDifference.y : point1.y - limitedDifference.y;
+    const newPoint = {x: newX, y: newY};
+    // console.log(newPoint);
     return newPoint;
 
   }

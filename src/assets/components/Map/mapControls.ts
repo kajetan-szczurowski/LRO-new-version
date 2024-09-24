@@ -185,7 +185,7 @@ function handleClick(map: mapType){
     }
 
     if (map.activeSide && map.activeAssetId){
-        map.controllFunction('move-order-output', [map.activeAssetId, map.absoluteMouseX - map.activeSide / 2, map.absoluteMouseY - map.activeSide / 2]);
+        map.controllFunction('move-order-output', [map.activeAssetId, map.absoluteMouseX - map.activeSide / 2, map.absoluteMouseY - map.activeSide / 2], map);
         const activeElement = map.assets.find(char => char.id === map.activeAssetId);
         if (!activeElement) return;
         activeElement.active = false;
@@ -226,12 +226,22 @@ function handleKeyDown(evt:KeyboardEvent, map:mapType){
 }
 
 function handleMouseMove(e:MouseEvent, map:mapType){
+    map.distanceOverflowing = false;
     map.mouseOnMap = true;
     const boundingRect = map.rawCanvas.getBoundingClientRect();
     map.mouseX = e.clientX - boundingRect.left;
     map.mouseY = e.clientY - boundingRect.top;
     map.absoluteMouseX = map.mouseX + map.sourceX - map.onCanvasX;
     map.absoluteMouseY = map.mouseY + map.sourceY - map.onCanvasY;
+
+    if (map.activeAssetId && map.measureRadius && map.distance.feets) {
+        const currentAsset = map.assets.find(a => a.id === map.activeAssetId);
+        if (!currentAsset) return;
+        if (!currentAsset.speed) return;
+        const currentFeets =  Number(map.distance.feets);
+        if (currentFeets > currentAsset.speed) 
+            map.distanceOverflowing = true;
+    }
 
 }
 

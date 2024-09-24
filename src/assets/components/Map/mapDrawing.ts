@@ -44,11 +44,14 @@ function drawMeasure(map: mapType){
 }
 
 function writeMeasureText(map:mapType){
+    const textFilStyle = map.distanceOverflowing? map.presets.DISTANCE_OVERFLOWING_FONT_FILL_STYLE : map.presets.DISTANCE_FONT_FILL_STYLE;
+    const textStrokeStyle = map.distanceOverflowing? map.presets.DISTANCE_OVERFLOWING_FONT_STROKE_STYLE : map.presets.DISTANCE_FONT_STROKE_STYLE;
+
     writeText({canvasContext: map.canvas, x:map.mouseX + 15, y: map.mouseY, font: map.measureFont, 
-        fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, text: `${map.distance.feets}ft`, strokeStyle: map.presets.DISTANCE_FONT_STROKE_STYLE})
+        fillStyle: textFilStyle, text: `${map.distance.feets}ft`, strokeStyle: textStrokeStyle})
 
     writeText({canvasContext: map.canvas, x:map.mouseX + 15, y: map.mouseY + map.canvas.measureText('M').width * 1.2, font: map.measureFont, 
-    fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, text: `${map.distance.meters}m`, strokeStyle: map.presets.DISTANCE_FONT_STROKE_STYLE})
+    fillStyle: textFilStyle, text: `${map.distance.meters}m`, strokeStyle: textStrokeStyle})
 }
 
 function drawMapBorderGraphic(map: mapType){

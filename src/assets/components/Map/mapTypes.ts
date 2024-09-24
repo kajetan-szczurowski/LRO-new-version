@@ -21,6 +21,7 @@ export type characterType = assetType & {
     aimedY?: number,
     id: string,
     active?: boolean,
+    speed?: number
 }
 
 export type mapType = assetType & {
@@ -74,6 +75,7 @@ export type mapType = assetType & {
     showMiniMap? :boolean,
     allowHideMiniMap? :boolean,
     placeholderFont: string,
+    distanceOverflowing? :boolean,
 
 }
 
@@ -165,7 +167,9 @@ export type mapPresets = {
     DISTANCE_CIRCLE_FILL_STYLE: string,
     DISTANCE_LINE_WIDTH_PERCENT: number,
     DISTANCE_FONT_FILL_STYLE: string,
+    DISTANCE_OVERFLOWING_FONT_FILL_STYLE: string,
     DISTANCE_FONT_STROKE_STYLE: string,
+    DISTANCE_OVERFLOWING_FONT_STROKE_STYLE: string,
     MINI_MAP_HIDE_FILTER_TIME?: number
 }
 
@@ -213,6 +217,8 @@ export function getMainMapPresets(){
         DISTANCE_CIRCLE_FILL_STYLE: 'rgba(80, 80, 80, 0.5)',
         DISTANCE_LINE_WIDTH_PERCENT: 10,
         DISTANCE_FONT_FILL_STYLE: 'white',
+        DISTANCE_OVERFLOWING_FONT_FILL_STYLE: 'red',
+        DISTANCE_OVERFLOWING_FONT_STROKE_STYLE: 'black',
         DISTANCE_FONT_STROKE_STYLE: 'black',
         MINI_MAP_HIDE_FILTER_TIME: 500
 

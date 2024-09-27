@@ -7,6 +7,7 @@ export function drawAll(map: mapType){
     drawMeasure(map);
     drawMapBorderGraphic(map);
     drawMiniMap(map);
+    drawPing(map);
     map.frameDrawing = false;
 
 }
@@ -29,16 +30,30 @@ function drawActiveAsset(map: mapType){
                    height: map.activeSide, fillStyle: map.presets.ASSET_ACTIVE_SHADOW_FILL_STYLE});
 }
 
+function drawPing(map: mapType){
+    if (!map.pinging) return;
+    if (!map.pingX || !map.pingY || !map.pingFilledRadius || !map.pingCutRadius) return;
+    drawTorus({canvasContext: map.canvas, x: map.pingX - map.x, y: map.pingY - map.y, fullRadius: map.pingFilledRadius, emptyRadius: map.pingCutRadius, fillStyle: map.presets.PING_FILL_STYLE});
+    if (map.showMiniMap && map.pingVisibleOnMiniMap) drawPingOnMiniMap(map);
+}
+
+function drawPingOnMiniMap(map: mapType){
+    if (!map.miniMapPingX || !map.miniMapPingY || !map.miniMapPingRadius) return;
+    drawCircle({canvasContext: map.canvas, x: map.miniMapPingX, y: map.miniMapPingY, radius: map.miniMapPingRadius, fillStyle: map.presets.PING_MINI_MAP_COLOR});
+}
+
 function drawMeasure(map: mapType){
     if (!map.measuring) return;
     const onCanvasX =  map.measurePoint.x - map.x;
     const onCanvasY = map.measurePoint.y - map.y;
+    const lineStyle = map.distanceOverflowing? map.presets.DISTANCE_OVERFLOWING_LINE_COLOR : map.presets.DISTANCE_LINE_COLOR;
+
 
     drawCircle({canvasContext: map.canvas, x: onCanvasX, y: onCanvasY, radius: map.measureRadius,
                 fillStyle: map.presets.DISTANCE_CIRCLE_FILL_STYLE});
 
     drawLine({canvasContext: map.canvas, x1: onCanvasX, y1: onCanvasY, x2: map.mouseX, y2: map.mouseY,
-        lineWidth: map.measureLineWidth, strokeStyle: map.presets.DISTANCE_LINE_COLOR});
+        lineWidth: map.measureLineWidth, strokeStyle: lineStyle});
 
     writeMeasureText(map);
 }
@@ -48,10 +63,10 @@ function writeMeasureText(map:mapType){
     const textStrokeStyle = map.distanceOverflowing? map.presets.DISTANCE_OVERFLOWING_FONT_STROKE_STYLE : map.presets.DISTANCE_FONT_STROKE_STYLE;
 
     writeText({canvasContext: map.canvas, x:map.mouseX + 15, y: map.mouseY, font: map.measureFont, 
-        fillStyle: textFilStyle, text: `${map.distance.feets}ft`, strokeStyle: textStrokeStyle})
+        fillStyle: textFilStyle, text: `${map.distance.feets} ft`, strokeStyle: textStrokeStyle})
 
     writeText({canvasContext: map.canvas, x:map.mouseX + 15, y: map.mouseY + map.canvas.measureText('M').width * 1.2, font: map.measureFont, 
-    fillStyle: textFilStyle, text: `${map.distance.meters}m`, strokeStyle: textStrokeStyle})
+    fillStyle: textFilStyle, text: `${map.distance.meters} m`, strokeStyle: textStrokeStyle})
 }
 
 function drawMapBorderGraphic(map: mapType){
@@ -165,6 +180,23 @@ function drawArc({canvasContext, x, y, radius, startAngle, endAngle, counterCloc
         return;
     }
 
+}
+
+function drawTorus({canvasContext, x, y, fullRadius, emptyRadius, fillStyle = undefined} : torusDrawingType){
+    if (fillStyle) canvasContext.fillStyle = fillStyle;
+    canvasContext.beginPath();
+    canvasContext.arc(x, y, fullRadius, 0, Math.PI * 2, false); // outer - filled
+    canvasContext.arc(x, y, emptyRadius, 0, Math.PI * 2, true); // inner - unfilled
+    canvasContext.fill();
+}
+
+type torusDrawingType = {
+    canvasContext: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    fullRadius: number,
+    emptyRadius: number,
+    fillStyle?: string
 }
 
 type rectangleDrawingType = {

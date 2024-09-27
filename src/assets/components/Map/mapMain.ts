@@ -33,6 +33,7 @@ export function processMap(canvasId : string, presets:mapPresets, charactersArra
         mapData = getDefaultMap(canvas, canvasObject, presets, controllFunction);
         controls.canvasEventListeners(mapData);
         socket.on('map-control', (parameters) => {mapData.controllFunction(parameters.controlWord, parameters.args, mapData)});
+
     }
 
 }
@@ -47,6 +48,7 @@ function performMapLogic(map: mapType, charactersSource: characterType[]){
     checkForRedrawning(map);
     controls.miniMapControl(map);
     controls.handleMeasure(map);
+    handlePing(map);
     return map;
 }
 
@@ -133,3 +135,75 @@ function checkForRedrawning(map: mapType){
     map.assets.forEach(item => {if (item.toBeRedrawn) map.toBeRedrawn = true});
 }
 
+function handlePing(map: mapType){
+    if (!map.pinging && !map.startPing) return;
+    if (map.startPing) initiatiePinging(map);
+    prepareNewPingFrame(map);
+    calculatePingOnMiniMap(map);
+    map.toBeRedrawn = true;
+}
+
+function initiatiePinging(map: mapType){
+    map.startPing = false;
+    map.pinging = true;
+    map.pingingCount = 1;
+    map.pingVisibleOnMiniMap = true;
+    resetPing(map);
+}
+
+function resetPing(map: mapType){
+    map.pingDirection = true;
+    map.pingFilledRadius = map.presets.PING_MINIMAL_RADIUS;
+    map.pingCutRadius = 0;
+}
+
+function prepareNewPingFrame(map: mapType){
+    if (map.pingDirection){
+        increasePing(map);
+        return;
+    }
+    decreasePing(map);
+}
+
+function increasePing(map: mapType){
+    if (!map.pingFilledRadius) return;
+    map.pingFilledRadius += map.presets.PING_INCREASE_RADIUS;
+    if (map.pingFilledRadius >= map.presets.PING_MAXIMAL_RADIUS) changePingDirections(map);
+}
+
+function decreasePing(map: mapType){
+    if (!map.pingCutRadius) return;
+    map.pingCutRadius += map.presets.PING_INCREASE_RADIUS;
+    if (map.pingCutRadius >= map.presets.PING_MAXIMAL_RADIUS) handleNewPingCycle(map);
+
+}
+
+function changePingDirections(map: mapType){
+    map.pingDirection = false;
+    map.pingFilledRadius = map.presets.PING_MAXIMAL_RADIUS;
+    map.pingCutRadius = map.presets.PING_MINIMAL_RADIUS;
+}
+
+function handleNewPingCycle(map: mapType){
+    if (!map.pingingCount) map.pingingCount = 1;
+    map.pingingCount++;
+    if (map.pingingCount > map.presets.PING_MAX_NUMBER_OF_CYCLES){
+        endPinging(map);
+        return;
+    }
+    resetPing(map);
+}
+
+function calculatePingOnMiniMap(map: mapType){
+    if (!map.miniMapWidth || !map.img || !map.pingX || !map.miniMapX) return;
+    if (!map.miniMapHeight || !map.pingY || !map.miniMapY) return;
+
+    map.miniMapPingX = map.miniMapWidth / map.img.width * map.pingX + map.miniMapX;
+    map.miniMapPingY = map.miniMapHeight / map.img.height * map.pingY + map.miniMapY;
+    map.miniMapPingRadius = map.presets.PING_MAXIMAL_RADIUS * map.miniMapWidth / map.img.width;
+}
+
+function endPinging(map: mapType){
+    map.pinging = false;
+    map.pingVisibleOnMiniMap = false;
+}

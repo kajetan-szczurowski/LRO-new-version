@@ -27,7 +27,7 @@ export default function Map() {
       case 'move-order-output':{
         const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         const newPoint = movePropositionMiddleware(args[0], args[1], args[2], mapData);
-        socket.emit('move-proposition', {id: args[0], x: newPoint.x, y: newPoint.y, userID: loggedUserID});
+        socket.emit('move-proposition', {id: args[0], limitedPosition: {x: newPoint.x, y: newPoint.y}, fullPosition:{x:args[1], y:args[2]}, userID: loggedUserID});
         return;
       }
 
@@ -58,6 +58,21 @@ export default function Map() {
       case 'delete-asset':{
         const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         socket.emit('delete-asset', {assetID: args[0], userID: loggedUserID});
+        return;
+      }
+
+      case 'ping-order':{
+        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
+        socket.emit('ping-order', {x: args[0], y: args[1], userID: loggedUserID});
+        return;
+      }
+
+      case 'start-pinging':{
+        if (mapData.pinging) return;
+        mapData.pingX = args[0];
+        mapData.pingY = args[1];
+        mapData.startPing = true;
+
       }
     }
   }
@@ -76,9 +91,13 @@ function movePropositionMiddleware(characterID: string, newX: number, newY: numb
 
 function mapDeveloping(){
   const testCharacter: characterType = {x: 50, y: 50, name: 'Andrzej', graphicUrl: 'https://s12.gifyu.com/images/SYsHt.png', id: '2137', speed: 15};
-  characters.push(testCharacter);
-  setTimeout(() => {testCharacter.aimedX = 300; testCharacter.aimedY = 300}, 1000)
+  // setTimeout(() => { 
+    //  characters.push(testCharacter)
+    //  testCharacter.aimedX = 300; testCharacter.aimedY = 300
+    // console.log('added')},
+      // 5000);
   // TEMP_mapDevelopement();
+
 }
 
 

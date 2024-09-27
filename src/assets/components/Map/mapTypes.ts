@@ -76,6 +76,18 @@ export type mapType = assetType & {
     allowHideMiniMap? :boolean,
     placeholderFont: string,
     distanceOverflowing? :boolean,
+    pinging? :boolean,
+    startPing? :boolean,
+    pingX? :number,
+    pingY? :number,
+    pingingCount? :number,
+    pingDirection?: boolean,
+    pingFilledRadius? :number,
+    pingCutRadius? :number,
+    pingVisibleOnMiniMap? :boolean,
+    miniMapPingX? :number,
+    miniMapPingY? :number,
+    miniMapPingRadius? :number
 
 }
 
@@ -170,7 +182,15 @@ export type mapPresets = {
     DISTANCE_OVERFLOWING_FONT_FILL_STYLE: string,
     DISTANCE_FONT_STROKE_STYLE: string,
     DISTANCE_OVERFLOWING_FONT_STROKE_STYLE: string,
-    MINI_MAP_HIDE_FILTER_TIME?: number
+    DISTANCE_OVERFLOWING_LINE_COLOR: string,
+    MINI_MAP_HIDE_FILTER_TIME?: number,
+    PING_TIME_MILISECONDS: number,
+    PING_MINIMAL_RADIUS: number,
+    PING_MAXIMAL_RADIUS: number,
+    PING_INCREASE_RADIUS: number,
+    PING_MAX_NUMBER_OF_CYCLES: number,
+    PING_FILL_STYLE: string,
+    PING_MINI_MAP_COLOR: string
 }
 
 export function getMainMapPresets(){
@@ -217,12 +237,18 @@ export function getMainMapPresets(){
         DISTANCE_CIRCLE_FILL_STYLE: 'rgba(80, 80, 80, 0.5)',
         DISTANCE_LINE_WIDTH_PERCENT: 10,
         DISTANCE_FONT_FILL_STYLE: 'white',
-        DISTANCE_OVERFLOWING_FONT_FILL_STYLE: 'red',
-        DISTANCE_OVERFLOWING_FONT_STROKE_STYLE: 'black',
+        DISTANCE_OVERFLOWING_FONT_FILL_STYLE: '#771a0e',
+        DISTANCE_OVERFLOWING_FONT_STROKE_STYLE: 'white',
+        DISTANCE_OVERFLOWING_LINE_COLOR: '#771a0e',
         DISTANCE_FONT_STROKE_STYLE: 'black',
-        MINI_MAP_HIDE_FILTER_TIME: 500
-
-
+        MINI_MAP_HIDE_FILTER_TIME: 500,
+        PING_TIME_MILISECONDS: 5000,
+        PING_MINIMAL_RADIUS: 20,
+        PING_MAXIMAL_RADIUS: 100,
+        PING_INCREASE_RADIUS: 10,
+        PING_MAX_NUMBER_OF_CYCLES: 5,
+        PING_FILL_STYLE: 'rgba(0,0,0,0.4)',
+        PING_MINI_MAP_COLOR: 'white'
     }
     
     return returned;

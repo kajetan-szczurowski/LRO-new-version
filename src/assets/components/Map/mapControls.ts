@@ -8,6 +8,8 @@ export function canvasEventListeners(map: mapType){
     map.rawCanvas.addEventListener('mouseout', () => {map.mouseOnMap = false});
     map.rawCanvas.addEventListener('click', () => handleClick(map));
     map.rawCanvas.addEventListener('contextmenu', (e) => handleContextMenu(e, map));
+    map.rawCanvas.addEventListener('dblclick', () => handleDoubleClick(map));
+    // map.rawCanvas.ondblclick(() => handleDoubleClick(map));
     addEventListener('resize', () => {map.resized = true})
     addEventListener('keydown', (e) => handleKeyDown(e, map));
     addEventListener("keyup", event => {map.pressedKeys[event.key] = false});
@@ -219,6 +221,14 @@ function handleClick(map: mapType){
     })
 }
 
+function handleDoubleClick(map: mapType){
+    if (!map.img) return;
+    if (map.absoluteMouseX < 0 || map.absoluteMouseY < 0) return;
+    if (map.absoluteMouseX > map.img.width) return;
+    if (map.absoluteMouseY > map.img.height) return;
+
+    map.controllFunction('ping-order', [map.absoluteMouseX, map.absoluteMouseY]);
+}
 
 function handleKeyDown(evt:KeyboardEvent, map:mapType){
     if (typeof map.pressedKeys != 'object') return;

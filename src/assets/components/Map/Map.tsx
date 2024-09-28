@@ -14,7 +14,6 @@ export default function Map() {
   const mainID = 'main-map';
   const SESSION_STORAGE_LOGIN_ID_KEY = 'LRO-logged-user-ID';
   setTimeout(() => {socket.emit('send-me-assets')}, 1000);
-  setTimeout(() => {mapDeveloping();}, 1000);
 
 
   processMap(mainID, getMainMapPresets(), characters, mapExternalControl, socket)
@@ -89,42 +88,9 @@ function movePropositionMiddleware(characterID: string, newX: number, newY: numb
 
 }
 
-function mapDeveloping(){
-  const testCharacter: characterType = {x: 50, y: 50, name: 'Andrzej', graphicUrl: 'https://s12.gifyu.com/images/SYsHt.png', id: '2137', speed: 15};
-  // setTimeout(() => { 
-    //  characters.push(testCharacter)
-    //  testCharacter.aimedX = 300; testCharacter.aimedY = 300
-    // console.log('added')},
-      // 5000);
-  // TEMP_mapDevelopement();
-
-}
-
-
-// function TEMP_mapDevelopement(){
-  //Delete after development
-
-  //developing alghoritm for shortening movement if exceeds characters speed
-  // const startPoint = {x: 50, y: 50};
-  // const points = [{x: 10, y: 10}, {x: 10, y: 50}, {x: 100, y: 10}, {x: 100, y: 50}, {x: 100, y: 100}, {x: 50, y: 100},
-  //   {x: 10, y: 100}, {x: 50, y: 10}];
-
-  // const distances = points.map(onePoint => geometry.euclideanDistance(onePoint.x, onePoint.y, startPoint.x, startPoint.y));
-  // const minimalDistance = Math.min(...distances);
-  // const targetDistance = minimalDistance - 1;
-  // console.log('distance: ', targetDistance)
-  // console.log(distances, minimalDistance, targetDistance)
-  // points.forEach(onePoint => {
-    // const newValue = TEMP_calculateNewPosition(startPoint, onePoint, targetDistance);
-    // const printDistance = geometry.euclideanDistance(onePoint.x, onePoint.y, newValue.x, newValue.y);
-    // console.log(`coming to ${onePoint.x}, ${onePoint.y}. Ended at ${newValue.x}, ${newValue.y}. Distance: ${printDistance}`)})
-
-  // }
-
   function calculateLimitedPosition(point1: pointType, point2: pointType, maxDistanceFeets: number, mapData: mapType) : pointType{ //TODO: move into mapControls
     const distance = geometry.euclideanDistance(point1.x, point1.y, point2.x, point2.y);
     const maxDistance = maxDistanceFeets / mapData.presets.FEET_DISTANCE_MULTIPLIER * mapData.presets.ASSET_SIZE;
-    // console.log('maxDistance: ' maxDistance)
     if (distance <= maxDistance) return point2;
     const difference = {x: Math.abs(point2.x - point1.x), y: Math.abs(point2.y - point1.y)};
     const angle = Math.abs(Math.asin(difference.x / distance));

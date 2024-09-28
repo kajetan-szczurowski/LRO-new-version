@@ -1,5 +1,4 @@
-import { characterElementType, aboutCharacterType } from '../../types/characterTypes'
-import ListWithHeader from './ListWithHeader'
+import { characterElementType } from '../../types/characterTypes'
 import { characterData } from './CharacterBox';
 import EditableAttribute from './Editables/EditableAttribute';
 
@@ -8,7 +7,6 @@ export default function About() {
   // if (!aboutData) return (<></>)
   // if (nothingToShow({...aboutData})) return;
   // const currentData = aboutData ?? [];
-  console.log(aboutData?.generalInfo.length)
   return (
 
     <div  className = "character-info">
@@ -37,13 +35,7 @@ export default function About() {
     </div>
   )
 
-  function nothingToShow({DCs, traits, abilities, generalInfo}:aboutCharacterType){
-    return isEmpty(DCs) && isEmpty(traits) && isEmpty(abilities) && isEmpty(generalInfo);
-  }
 
-  function isEmpty(input: characterElementType[] | string[]){
-    return input.length === 0;
-  }
 
   function ListDisplayer({data, group}: listDisplayerProps){
     let index = -1;

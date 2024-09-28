@@ -231,8 +231,8 @@ function getPlaceholderData():characterDataType{
 export async function downloadCharacterData(id: string, state: Signal<characterDataType[]>){
   // console.log('siema?')
   try{
-    // const data = await fetch(`http://localhost:3000/character/${id}`);
-    const data = await fetch(`https://lro-2-alpha-backend-production.up.railway.app/character/${id}`);
+    const data = await fetch(`http://localhost:3000/character/${id}`);
+    // const data = await fetch(`https://lro-2-alpha-backend-production.up.railway.app/character/${id}`);
     // console.log(data)
     console.log(`pobieram ${id}`)
     const jsoned = await data.json();

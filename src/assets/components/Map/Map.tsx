@@ -133,10 +133,8 @@ function mapDeveloping(){
     const limitedDifference = {x: maxDistance * Math.sin(angle), y: maxDistance * Math.cos(angle)};
     const newX = (point2.x > point1.x) ? point1.x + limitedDifference.x: point1.x - limitedDifference.x;
     const newY = (point2.y > point1.y) ? point1.y + limitedDifference.y : point1.y - limitedDifference.y;
-    const newPoint = {x: newX, y: newY};
-    // console.log(newPoint);
+    const newPoint = (point2.x !== point2.y)? {x: newX, y: newY}: {x: point2.x, y: (point2.y > point1.y)? point1.y + maxDistance : point1.y - maxDistance};
     return newPoint;
-
   }
 
   type pointType = {

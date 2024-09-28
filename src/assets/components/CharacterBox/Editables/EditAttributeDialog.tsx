@@ -13,7 +13,6 @@ export default function EditAttributeDialog() {
     const socket = useSocket();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const oneLinerRef = useRef<HTMLInputElement>(null);
-    const multiLinerRef = useRef<HTMLTextAreaElement>(null);
 
 
     const primaryDivRef = useRef<HTMLDivElement>(null);
@@ -22,7 +21,6 @@ export default function EditAttributeDialog() {
     handleDialog();
 
     const newItem = editSignal.value.newItem;
-    const disableDelete = editSignal.value.disableDelete;
     const DELETE_MARGIN_LEFT_STYLE = {marginLeft: '0.15rem'};
     const isMultiline = editSignal.value.multiline;
     const maxLength = editSignal.value.maxLength || DEFAULT_MAX_INPUT_LENGTH;
@@ -30,9 +28,6 @@ export default function EditAttributeDialog() {
     // const inputClass = isMultiline?  'display-none': 'input-filter';
     const inputClass = getInputClass(!isMultiline);
     // const textAreaClass = !isMultiline?  'display-none': 'input-filter';
-    const textAreaClass = getInputClass(isMultiline ?? false);
-    const deleteSButtonStyle = isMultiline? DELETE_MARGIN_LEFT_STYLE : {};
-    const deleteButtonExtraClass = (newItem || disableDelete)? 'display-none': '';
 
 
     const toDeleteLabel = editSignal.value.title || editSignal.value.text.slice(0, LABEL_LENGTH_IF_TITLE_OMITTED);
@@ -79,14 +74,6 @@ export default function EditAttributeDialog() {
         if (dialogRef.current.open) dialogRef.current.close();
     }
 
-    function showDeleteQuestion(e: React.FormEvent) {
-        e.preventDefault();
-        if (!primaryDivRef.current) return;
-        if (!secondaryDivRef.current) return;
-        primaryDivRef.current.style.display = 'none';
-        secondaryDivRef.current.style.display = 'block';
-    }
-
     function hideDeleteQuestion(){
         if (!primaryDivRef.current) return;
         if (!secondaryDivRef.current) return;
@@ -100,7 +87,6 @@ export default function EditAttributeDialog() {
             if (!dialogRef.current) return;
             if (!oneLinerRef.current) return;
             // if (!multiLinerRef.current) return;
-            const isMultiline = editSignal.value.multiline;
             // if (isMultiline) multiLinerRef.current.value = editSignal.value.text;
             oneLinerRef.current.value = editSignal.value.text;
             // if (newItem) multiLinerRef.current.value = '';

@@ -11,6 +11,7 @@ import CharacterEditDialog from './CharacterEditDialog';
 import AuxilaryCharacterButton from './AuxilaryCharacterButton';
 import Combat from './Combat';
 import { triggerSettingsWindow } from './Settings';
+import { triggerControlsWindow } from './ControlsView';
 import { usersDataState } from '../../states/GlobalState';
 import { useSocket } from '../../providers/SocketProvider';
 import EditAttributeDialog from './Editables/EditAttributeDialog';
@@ -81,8 +82,10 @@ export default function CharacterBox() {
         <CharacterEditDialog/>
         <EditAttributeDialog/>
         <div id = 'login-bar'>
+          <AuxilaryCharacterButton onClickEvent={triggerControlsWindow} label = 'question' />
           <AuxilaryCharacterButton onClickEvent={triggerSettingsWindow} label = 'gear' />
           <AuxilaryCharacterButton onClickEvent={handleRefresh} label = 'refresh' />
+          
           <Login/>
         </div>
 

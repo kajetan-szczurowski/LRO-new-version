@@ -49,8 +49,10 @@ export function miniMapControl(map:mapType){
 export function handleMeasure(map:mapType){
     if (!map.mouseOnMap) return;
     if (map.measuring) calculateMeasure(map);
+    handleMoveOverflow(map);
     const enable = map.pressedKeys[map.presets.START_MEASURE_KEY] || map.pressedKeys[map.presets.START_MEASURE_KEY.toUpperCase()];
     const disable = map.pressedKeys[map.presets.STOP_MEASURE_KEY] || map.pressedKeys[map.presets.STOP_MEASURE_KEY.toUpperCase()];
+
 
     if ((!enable && !disable) || (enable && disable)) return;
     if ((map.measuring && enable) || !map.measuring && disable) return;
@@ -59,6 +61,18 @@ export function handleMeasure(map:mapType){
     if (map.measuring && disable) stopMeasuring(map);
 }
 
+
+function handleMoveOverflow(map: mapType){
+    if (map.activeAssetId && map.measureRadius && map.distance.feets) {
+        const currentAsset = map.assets.find(a => a.id === map.activeAssetId);
+        if (!currentAsset) return;
+        if (!currentAsset.speed) return;
+        const currentFeets =  Number(map.distance.feets);
+        if (currentFeets > currentAsset.speed) 
+            map.distanceOverflowing = true;
+    }
+
+}
 
 
 
@@ -243,16 +257,10 @@ function handleMouseMove(e:MouseEvent, map:mapType){
     map.mouseY = e.clientY - boundingRect.top;
     map.absoluteMouseX = map.mouseX + map.sourceX - map.onCanvasX;
     map.absoluteMouseY = map.mouseY + map.sourceY - map.onCanvasY;
+    handleMoveOverflow(map);
 
-    if (map.activeAssetId && map.measureRadius && map.distance.feets) {
-        const currentAsset = map.assets.find(a => a.id === map.activeAssetId);
-        if (!currentAsset) return;
-        if (!currentAsset.speed) return;
-        const currentFeets =  Number(map.distance.feets);
-        if (currentFeets > currentAsset.speed) 
-            map.distanceOverflowing = true;
-    }
 
+  
 }
 
 function checkForScrolling(map:mapType, mousePosition: number, sideLength: number){

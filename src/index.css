@@ -32,6 +32,15 @@ dialog::backdrop{
   text-align: center;
 }
 
+.controls-window{
+  width: 500px;
+}
+
+.control-item{
+  display: flex;
+  justify-content: space-between;
+}
+
 main{
   display: flex;
   width: 100vw;

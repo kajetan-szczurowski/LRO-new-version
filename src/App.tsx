@@ -4,6 +4,7 @@ import Map from './assets/components/Map/Map';
 import { SocketProvider } from './assets/providers/SocketProvider';
 import Settings from './assets/components/CharacterBox/Settings';
 import GlobalState from './assets/states/GlobalState';
+import ControlsView from './assets/components/CharacterBox/ControlsView';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
 
         <CharacterBox/>
         <Settings/>
+        <ControlsView/>
         </main>
       </SocketProvider>
     

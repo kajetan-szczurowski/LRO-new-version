@@ -24,6 +24,7 @@ export default function() {
     const divRef = useRef<HTMLDivElement>(null);
     const socket = useSocket();
     const [messages, setMessages] = useState<MessageType[]>([]);
+    console.log(messages)
     useEffect(() => scrollChatBox(), [messages])
     socket.on('messages', (msgFromServer) => setMessages(msgFromServer))
     return(
@@ -46,11 +47,14 @@ export default function() {
     id: string | number,
     messageTypeName: string,
     text: string,
-    result? :string,
+    result? :MessageResultType,
     sender? :string,
     rawOrder? :string,
-    comment? :string
+    comment? :string,
+    totalValue?: string | number
   }
+
+  export type MessageResultType = string | number | [number, string][] ;
 
 
 // }

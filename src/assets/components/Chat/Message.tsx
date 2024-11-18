@@ -1,8 +1,16 @@
-import { MessageType } from "./Chat"
+import { MessageType, MessageResultType } from "./Chat"
 import NumericAndTextSpans from "../NumericAndTextSpans";
 
+const damageIcons = new Map([
+    ['S', '⚔️'],
+    ['P', '🏹'],
+    ['B', '🔨'],
+    ['F', '🔥'],
+    ['L', '⚡']
+]);
+
 export default function Message({data}:props) {
-    const {messageTypeName, text, sender, rawOrder, result, comment} = data;
+    const {messageTypeName, text, sender, rawOrder, result, comment, totalValue} = data;
 
   return(
     <div>
@@ -33,7 +41,7 @@ export default function Message({data}:props) {
                     <NumericAndTextSpans value = {text} digitsClass="message-splited-result digit-font" nonDigitsClass="message-splited-result"/>
                 </span>
                 <> </>
-                <NumericAndTextSpans value = {result} digitsClass="message-roll-result digit-font" nonDigitsClass="message-roll-result"/>
+                <NumericAndTextSpans value = {handleRollResultValue(result, totalValue)} digitsClass="message-roll-result digit-font" nonDigitsClass="message-roll-result"/>
                 {comment && <> </>}
                 {comment && <NumericAndTextSpans value = {comment} digitsClass="message-roll-comment digit-font" nonDigitsClass="message-roll-comment"/>}
             </>
@@ -41,8 +49,27 @@ export default function Message({data}:props) {
       }
   }
 
+  function handleRollResultValue(resultText: MessageResultType | undefined, totalValue: number | string | undefined){
+    if (!resultText) return undefined;
+    if (!Array.isArray(resultText)) return resultText;
+    if (!totalValue) return undefined;
+    let handled = "";
+    resultText.forEach(chunk => {handled = appendTextValue(handled, chunk)}); 
+    return `${handled.slice(0, handled.length - 3)} = ${totalValue}`;
+
+    function appendTextValue(text:string, current:[number, string]){
+        return text + `${current[0]}${inputSign(current[1])} + `;
+    }
+
+    function inputSign(signText:string){
+        const icon = damageIcons.get(signText);
+        return icon? icon : `[${signText}]`;
+    }
+  }
+
   function isNatural(rollText: string, rollOrder: string | undefined){
     if (!rollOrder) return false;
+    if (Array.isArray(rollText)) return false;
     const orderStart = rollOrder.slice(0,3);
     if (orderStart !== 'd20') return false;
     const textStart = rollText.slice(0,2);

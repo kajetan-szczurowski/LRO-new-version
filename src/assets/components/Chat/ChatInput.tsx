@@ -69,6 +69,7 @@ export default function ChatInput() {
 
   function compileChatSignal(){
     const {modifier, description} = chatInputSignal.value;
+    console.log(modifier, description)
     if (!modifier && !description) return('');
     if (description === '') return('');
 
@@ -79,6 +80,9 @@ export default function ChatInput() {
     if (description === 'secret') {
       return useSecretRoll();
     }
+
+    if (modifier.includes('['))
+      return `#${modifier} #${description}`;
 
     const lettersInside = /[a-zA-Z]/g.test(modifier);
     if (!lettersInside){

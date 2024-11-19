@@ -22,7 +22,7 @@ export default function CharacterEditDialog() {
             <div className='edit-dialog-inside' ref = {primaryDivRef}>
                 <form id = 'character-edit-form' onSubmit={handleSubmit}>
                     <label htmlFor='edit-input'>{characterEditSignal.value.name}:</label>
-                    <input maxLength={30} ref = {inputRef} type = 'text' name = 'edit-input' id = 'character-edit-input' className='input-filter'></input>
+                    <input maxLength={60} ref = {inputRef} type = 'text' name = 'edit-input' id = 'character-edit-input' className='input-filter'></input>
                 </form>
                 <button className='delete-button' onClick = {showDeleteQuestion}>Delete</button>
             </div>

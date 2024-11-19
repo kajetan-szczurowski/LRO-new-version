@@ -1,16 +1,10 @@
 import { MessageType, MessageResultType } from "./Chat"
 import NumericAndTextSpans from "../NumericAndTextSpans";
-
-const damageIcons = new Map([
-    ['S', '⚔️'],
-    ['P', '🏹'],
-    ['B', '🔨'],
-    ['F', '🔥'],
-    ['L', '⚡']
-]);
+import { getDamageIcons } from "../DamageIcons";
 
 export default function Message({data}:props) {
     const {messageTypeName, text, sender, rawOrder, result, comment, totalValue} = data;
+    const damageIcons = getDamageIcons();
 
   return(
     <div>

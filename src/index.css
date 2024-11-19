@@ -686,6 +686,12 @@ span[class^="rolls-family-visibility-"]{
   background-color: rgba(255,255,255,0.2);
 }
 
+.rolls-icons-wrapper{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+
 @media (max-width: 800px){
   body {
     overflow-y: auto;
@@ -710,7 +716,6 @@ span[class^="rolls-family-visibility-"]{
   #main-map{
     display:none;
   }
-
 
 
 }

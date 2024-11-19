@@ -5,6 +5,7 @@ import { characterData } from './CharacterBox';
 import { useRef } from 'react';
 import { useSocket } from '../../providers/SocketProvider';
 import { usersDataState } from '../../states/GlobalState';
+import { getDamageIcons } from '../DamageIcons';
 
 
 export default function Rolls() {
@@ -48,9 +49,11 @@ function RollsFamilies({rolls, filter, rolledDictionary}:familiesProps){
                         <input maxLength={30} ref = {labelRef} name='new-roll-label' id = 'new-roll-label-input' type = 'text' />
                     </div>
 
+                    <Icons></Icons>
+
                     <div>
                         <label htmlFor='new-roll-value'>Value:</label>
-                        <input maxLength={30} ref = {valueRef} name='new-roll-value' id = 'new-roll-value-input' type = 'text' />
+                        <input maxLength={60} ref = {valueRef} name='new-roll-value' id = 'new-roll-value-input' type = 'text' />
                     </div>
 
                     <div>
@@ -81,6 +84,22 @@ function RollsFamilies({rolls, filter, rolledDictionary}:familiesProps){
             socket.emit('refresh-character');
             if (newRollDialogRef.current.open) newRollDialogRef.current.close();
 
+        }
+
+        function Icons(){
+            const damageIcons = getDamageIcons();
+            const iconKeys = Array.from(damageIcons.keys());
+            return(
+                <section className='rolls-icons-wrapper'>  
+                    {iconKeys.map(icon  => <div onClick = {() => handleIconClick(icon)}>{damageIcons.get(icon)}</div>)}
+                </section>
+            )
+
+            function handleIconClick(sign: string){
+                if (!valueRef.current) return;
+                valueRef.current.value += `[${sign}]`;
+                valueRef.current.focus();
+            }
         }
     
     }

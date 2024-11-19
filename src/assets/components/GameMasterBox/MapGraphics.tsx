@@ -15,10 +15,11 @@ export default function MapGraphics() {
     const newAssetTypeRef = useRef<HTMLSelectElement>(null);
     const [mapsToAdd, setMapsToAdd] = useState<graphicAssetType[]>([]);
     const [assetsToAdd, setAssetsToAdd] = useState<graphicAssetType[]>([]);
+    type assetType = {label: string, url: string};
 
 
-    socket.on('maps', maps => setMaps(maps));
-    socket.on('assets', assets => setAssets(assets));
+    socket.on('maps', maps => setMaps(maps.sort((a : assetType, b : assetType) => a.label.localeCompare(b.label) )));
+    socket.on('assets', assets => setAssets(assets.sort((a : assetType, b : assetType) => a.label.localeCompare(b.label) )));
 
     if (!userIsGM) return(<></>)
 
@@ -27,6 +28,7 @@ export default function MapGraphics() {
         <section id = 'admin-box'>
             <ol>
                 {maps.map(m => {
+                    console.log
                     return(<li key = {m.label} className = 'character-box-clickable' onClick = {() => changeMap(m.url)}>{m.label}</li>)
                 })}
             </ol>

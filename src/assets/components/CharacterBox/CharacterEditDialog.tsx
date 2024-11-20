@@ -65,12 +65,14 @@ export default function CharacterEditDialog() {
     }
 
     function handleSubmit(e: React.FormEvent){
+        console.log('cześć')
         e.preventDefault();
         if (!dialogRef.current) return;
         if (!inputRef.current) return;
         dialogRef.current.close();
         const payload = getEmitPayload();
-        if (payload.value.length > 20) return;        
+        console.log(payload.value.length)
+        if (payload.value.length > 60) return;        
         socket.emit('edit-character', payload);
         saveCharacter();
     }

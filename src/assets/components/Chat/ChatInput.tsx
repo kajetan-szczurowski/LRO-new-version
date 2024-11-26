@@ -4,7 +4,7 @@ import { useSocket } from '../../providers/SocketProvider';
 import { InputListWithLimit } from '../../dataTypes/chatHistory';
 import { characterNameSignal } from '../CharacterBox/CharacterBox';
 
-export const chatInputSignal = signal({modifier: '', description: ''});
+export const chatInputSignal = signal<chatInputType>({modifier: '', description: ''});
 
 export default function ChatInput() {
   const historyKey = 'lets-roll-one-chat-input-history';
@@ -68,10 +68,13 @@ export default function ChatInput() {
   }
 
   function compileChatSignal(){
-    const {modifier, description} = chatInputSignal.value;
-    console.log(modifier, description)
+    const {modifier, description, isAppendix} = chatInputSignal.value;
     if (!modifier && !description) return('');
     if (description === '') return('');
+
+    if (isAppendix){
+      return useAppendixRoll(modifier);
+    }
 
     if (description === 'singular-dice'){
       return useDiceSignal(modifier);
@@ -97,6 +100,20 @@ export default function ChatInput() {
 
     return('');
 }
+
+  function useAppendixRoll(modifier: string){
+    const inputArea: any = document.getElementById('input-area');
+    if (!inputArea) return'';
+    const inputValue = inputArea.value as string;
+    if (modifier === '') return inputValue;
+    const firstHashIndex = inputValue.indexOf('#');
+    if (firstHashIndex === -1) return `#${prepareAppendix(modifier)}`;
+    const secondHashIndex = inputValue.indexOf('#', firstHashIndex + 1);
+    if (secondHashIndex === -1) return `${inputValue}${prepareAppendix(modifier)}`;
+    const valueBeforeSecondHash = inputValue.substring(0, secondHashIndex).trim();
+    const valueAfterSecondHash = inputValue.substring(secondHashIndex).trim();
+    return `${valueBeforeSecondHash}${prepareAppendix(modifier)} ${valueAfterSecondHash}`;
+  }
 
   function useSecretRoll(){
     const inputArea: any = document.getElementById('input-area');
@@ -182,5 +199,19 @@ export default function ChatInput() {
     return reversed;
   }
 
+  function prepareAppendix(rawAppendix: string){
+    const newAppendix = rawAppendix.trim();
+    if (newAppendix.length === 0) return '';
+    if (newAppendix.charAt(0) === '+' || newAppendix.charAt(0) === '-') return newAppendix;
+    return '+' + newAppendix;
+  }
 
+
+}
+
+type chatInputType = {
+  description: string;
+  modifier: string;
+  isAppendix? : boolean
+  
 }

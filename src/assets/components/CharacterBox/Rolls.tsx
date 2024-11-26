@@ -158,6 +158,7 @@ function getFamiliesNames(rolls: characterElementType[]){
         if (names.includes(r.family)) return;
         names.push(r.family);
     })
+    if (!names.includes('modifiers')) names.push('modifiers');
     return names;
 }
 

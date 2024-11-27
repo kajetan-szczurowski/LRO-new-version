@@ -56,6 +56,7 @@ export default function Message({data}:props) {
     }
 
     function inputSign(signText:string){
+        if (!signText) return '';
         const icon = damageIcons.get(signText);
         return icon? icon : `[${signText}]`;
     }

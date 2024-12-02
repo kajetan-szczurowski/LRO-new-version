@@ -9,7 +9,28 @@ export function drawAll(map: mapType){
     drawMiniMap(map);
     drawPing(map);
     map.frameDrawing = false;
+    drawContextMenu(map);
 
+}
+
+function drawContextMenu(map: mapType){
+    // return;
+    if (!map.isContextMenuOpened) return;
+    if (!map.mapContextMenuX || !map.mapContextMenuY || !map.mapContextMenuWidth || !map.mapContextMenuHeight) return;
+    if (!map.choosenContextMenu) return;
+    const fontType = `${map.mapContextMenuFontSize}px ${map.mapContextMenuFontName}`; //TODO: move to map property
+
+    // drawRectangle({canvasContext: map.canvas, x:map.mouseX - map.mapContextMenuWidth / 2, y:map.mouseY - map.mapContextMenuHeight / 2, 
+    //                    width: map.mapContextMenuWidth, height: map.mapContextMenuHeight, strokeStyle: '#372e24', lineWidth: 2, fillStyle: '#493f32'});
+    drawRectangle({canvasContext: map.canvas, x:map.mapContextMenuX, y:map.mapContextMenuY, width: map.mapContextMenuWidth, 
+            height:map.mapContextMenuHeight, strokeStyle: '#372e24', lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH, fillStyle: '#493f32'});
+    // console.log(map.measureFont)
+    let textY = map.mapContextMargin + map.mapContextMenuY;
+    for (const item of map.choosenContextMenu){
+        writeText({canvasContext: map.canvas, x:map.mapContextMenuX + map.mapContextMargin, y: textY, font: fontType, 
+            fillStyle: '#bca45c', text: item.label})
+    }
+    
 }
 
 function drawAsset(asset: characterType, map: mapType){

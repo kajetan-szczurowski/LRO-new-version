@@ -118,6 +118,10 @@ function handleContextMenu(e:MouseEvent, map:mapType){
             map.controllFunction('delete-asset', [map.assets[i].id]);
         }
     }
+    map.isContextMenuOpened = true;
+    map.mapContextMenuX = map.mouseX;
+    map.mapContextMenuY = map.mouseY;
+    map.toBeRedrawn = true;
 }
 
 

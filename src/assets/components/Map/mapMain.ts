@@ -3,6 +3,7 @@ import * as drawing from "./mapDrawing"
 import * as controls from "./mapControls"
 import * as characters from "./mapCharacters"
 import * as mapMath from "./mapMath"
+import * as rightClickMenu from "./mapRightClickMenu"
 import { Socket } from "socket.io-client";
 import { limitValue } from "./mapControls";
 
@@ -49,6 +50,7 @@ function performMapLogic(map: mapType, charactersSource: characterType[]){
     controls.miniMapControl(map);
     controls.handleMeasure(map);
     handlePing(map);
+    rightClickMenu.handleRightClickMenu(map);
     return map;
 }
 

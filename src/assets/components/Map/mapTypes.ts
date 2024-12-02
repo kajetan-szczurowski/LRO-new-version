@@ -87,9 +87,20 @@ export type mapType = assetType & {
     pingVisibleOnMiniMap? :boolean,
     miniMapPingX? :number,
     miniMapPingY? :number,
-    miniMapPingRadius? :number
-
+    miniMapPingRadius? :number,
+    isContextMenuOpened? :boolean,
+    choosenContextMenu?: rightClickMenuType,
+    mapContextMenuWidth? :number,
+    mapContextMenuHeight? :number,
+    mapContextMenuX? :number,
+    mapContextMenuY? :number,
+    mapContextMargin: number,
+    mapContextMenuFontSize: number,
+    mapContextMenuFontName: string
 }
+
+export type rightClickMenuType = {label:string, event: Function}[]
+
 
 export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: HTMLCanvasElement, presets:mapPresets, externalFunction: Function){
     const returned : mapType = {
@@ -129,7 +140,10 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         showMiniMap: true,
         allowHideMiniMap: true,
         placeholderFont: '30px Fondamento',
-        name: 'placeholder-name'
+        name: 'placeholder-name',
+        mapContextMargin: 15,
+        mapContextMenuFontSize: 11,
+        mapContextMenuFontName: 'Fondamento'
         
     }
 

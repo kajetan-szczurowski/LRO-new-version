@@ -72,6 +72,8 @@ export default function ChatInput() {
     if (!modifier && !description) return('');
     if (description === '') return('');
 
+    console.log(modifier, description)
+
     if (isAppendix){
       return useAppendixRoll(modifier);
     }
@@ -85,6 +87,9 @@ export default function ChatInput() {
     }
 
     if (modifier.includes('['))
+      return `#${modifier} #${description}`;
+
+    if (/^([0-9]+)d([0-9]+)$/.test(modifier))
       return `#${modifier} #${description}`;
 
     const lettersInside = /[a-zA-Z]/g.test(modifier);

@@ -2,6 +2,7 @@ import { mapType } from "./mapTypes"
 import { isMouseOnCharacter } from "./mapCharacters";
 import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
+import { initContextMenu } from "./mapRightClickMenu";
 
 export function canvasEventListeners(map: mapType){
     map.rawCanvas.addEventListener('mousemove', (e) => handleMouseMove(e, map));
@@ -118,10 +119,8 @@ function handleContextMenu(e:MouseEvent, map:mapType){
             map.controllFunction('delete-asset', [map.assets[i].id]);
         }
     }
-    map.isContextMenuOpened = true;
-    map.mapContextMenuX = map.mouseX;
-    map.mapContextMenuY = map.mouseY;
-    map.toBeRedrawn = true;
+    initContextMenu(map);
+
 }
 
 

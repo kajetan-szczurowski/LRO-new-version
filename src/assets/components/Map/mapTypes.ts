@@ -90,13 +90,23 @@ export type mapType = assetType & {
     miniMapPingRadius? :number,
     isContextMenuOpened? :boolean,
     choosenContextMenu?: rightClickMenuType,
-    mapContextMenuWidth? :number,
-    mapContextMenuHeight? :number,
-    mapContextMenuX? :number,
-    mapContextMenuY? :number,
-    mapContextMargin: number,
-    mapContextMenuFontSize: number,
-    mapContextMenuFontName: string
+    contextMenuWidth? :number,
+    contextMenuHeight? :number,
+    contextMenuX? :number,
+    contextMenuY? :number,
+    contextMargin: number,
+    contextItemsDistance: number,
+    contextExtraDownMargin: number,
+    contextMenuFontSize: number,
+    contextMenuFontName: string,
+    contextMenuBackgroundColor: string,
+    contextMenuTextColor: string,
+    contextMenuBackgroundColorHover: string,
+    contextMenuTextColorHover: string,
+    contextMenuBorderColor: string,
+    contexMenuFontStyle? :string,
+    selectedContextMenuItem?: number
+    
 }
 
 export type rightClickMenuType = {label:string, event: Function}[]
@@ -141,9 +151,18 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         allowHideMiniMap: true,
         placeholderFont: '30px Fondamento',
         name: 'placeholder-name',
-        mapContextMargin: 15,
-        mapContextMenuFontSize: 11,
-        mapContextMenuFontName: 'Fondamento'
+        contextMargin: 10,
+        contextItemsDistance: 5,
+        contextMenuFontSize: 15,
+        contextExtraDownMargin: 10,
+        contextMenuFontName: 'Fondamento',
+        contextMenuBackgroundColor: '#493f32',
+        contextMenuTextColor: '#bca45c',
+        contextMenuBackgroundColorHover: '#771a0e',
+        // contextMenuTextColorHover: '#d8bb66',
+        contextMenuTextColorHover: '#f00',
+
+        contextMenuBorderColor: '#372e24',
         
     }
 

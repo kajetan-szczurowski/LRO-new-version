@@ -16,19 +16,25 @@ export function drawAll(map: mapType){
 function drawContextMenu(map: mapType){
     // return;
     if (!map.isContextMenuOpened) return;
-    if (!map.mapContextMenuX || !map.mapContextMenuY || !map.mapContextMenuWidth || !map.mapContextMenuHeight) return;
-    if (!map.choosenContextMenu) return;
-    const fontType = `${map.mapContextMenuFontSize}px ${map.mapContextMenuFontName}`; //TODO: move to map property
+    if (!map.contextMenuX || !map.contextMenuY || !map.contextMenuWidth || !map.contextMenuHeight) return;
+    if (!map.choosenContextMenu || ! map.contexMenuFontStyle ) return;
 
     // drawRectangle({canvasContext: map.canvas, x:map.mouseX - map.mapContextMenuWidth / 2, y:map.mouseY - map.mapContextMenuHeight / 2, 
     //                    width: map.mapContextMenuWidth, height: map.mapContextMenuHeight, strokeStyle: '#372e24', lineWidth: 2, fillStyle: '#493f32'});
-    drawRectangle({canvasContext: map.canvas, x:map.mapContextMenuX, y:map.mapContextMenuY, width: map.mapContextMenuWidth, 
-            height:map.mapContextMenuHeight, strokeStyle: '#372e24', lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH, fillStyle: '#493f32'});
+    drawRectangle({canvasContext: map.canvas, x:map.contextMenuX, y:map.contextMenuY, width: map.contextMenuWidth, 
+            height:map.contextMenuHeight, strokeStyle: map.contextMenuBorderColor,
+             lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH, fillStyle: map.contextMenuBackgroundColor});
     // console.log(map.measureFont)
-    let textY = map.mapContextMargin + map.mapContextMenuY;
-    for (const item of map.choosenContextMenu){
-        writeText({canvasContext: map.canvas, x:map.mapContextMenuX + map.mapContextMargin, y: textY, font: fontType, 
-            fillStyle: '#bca45c', text: item.label})
+    let textY = map.contextMenuY + map.contextMargin;
+
+    let label: string;
+    for (let index = 0; index < map.choosenContextMenu.length; index++){
+        textY += map.contextMenuFontSize;
+        label = map.choosenContextMenu[index].label; 
+        const textColor = index === map.selectedContextMenuItem? map.contextMenuTextColorHover: map.contextMenuTextColor;
+        writeText({canvasContext: map.canvas, x:map.contextMenuX + map.contextMargin, y: textY, font: map.contexMenuFontStyle, 
+            fillStyle: textColor, text: label})
+        textY += map.contextItemsDistance;
     }
     
 }

@@ -2,7 +2,8 @@ import { mapType } from "./mapTypes"
 import { isMouseOnCharacter } from "./mapCharacters";
 import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
-import { initContextMenu } from "./mapRightClickMenu";
+import { initContextMenu, handleRightMenuMouseDown, closeContextMenu } from "./mapRightClickMenu";
+import { handleDrawingMode, resetDrawingModeShape } from "./mapDrawingMode";
 
 export function canvasEventListeners(map: mapType){
     map.rawCanvas.addEventListener('mousemove', (e) => handleMouseMove(e, map));
@@ -198,6 +199,12 @@ function handleMapBorderLogic(map:mapType){
 
 function handleClick(map: mapType){
 
+    if (map.isContextMenuOpened){
+        handleRightMenuMouseDown(map);
+        return;
+    }
+
+
     if (map.mouseOnMiniMap && map.miniMapAimedX !== undefined && map.miniMapAimedY !== undefined && map.showMiniMap){
         moveMap(map, map.miniMapAimedX, map.miniMapAimedY);
         return;
@@ -247,9 +254,16 @@ function handleDoubleClick(map: mapType){
     map.controllFunction('ping-order', [map.absoluteMouseX, map.absoluteMouseY]);
 }
 
+function handleEscapeButton(map: mapType){
+    closeContextMenu(map);
+    resetDrawingModeShape(map);
+}
+
 function handleKeyDown(evt:KeyboardEvent, map:mapType){
     if (typeof map.pressedKeys != 'object') return;
     map.pressedKeys[evt.key] = true;
+    if (evt.key === 'Escape') handleEscapeButton(map);
+    handleDrawingMode(map);
 }
 
 function handleMouseMove(e:MouseEvent, map:mapType){
@@ -261,8 +275,7 @@ function handleMouseMove(e:MouseEvent, map:mapType){
     map.absoluteMouseX = map.mouseX + map.sourceX - map.onCanvasX;
     map.absoluteMouseY = map.mouseY + map.sourceY - map.onCanvasY;
     handleMoveOverflow(map);
-
-
+    handleDrawingMode(map);
   
 }
 

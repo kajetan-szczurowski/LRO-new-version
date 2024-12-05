@@ -105,7 +105,19 @@ export type mapType = assetType & {
     contextMenuTextColorHover: string,
     contextMenuBorderColor: string,
     contexMenuFontStyle? :string,
-    selectedContextMenuItem?: number
+    contextMenuItemHeight: number,
+    selectedContextMenuItem?: number,
+    contextMenuMinWidth :number,
+    drawingModeShape? :string,
+    drawingModeX : number,
+    drawingModeY : number,
+    drawingModeSize: number,
+    drawingModeDefaultSize: number,
+    drawingModePreviewStyle: string,
+    drawingModeSizeIncrease: number,
+    drawingModeMaxSize: number,
+    drawingModeMinSize: number,
+    drawinModeAngle: number
     
 }
 
@@ -159,10 +171,21 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         contextMenuBackgroundColor: '#493f32',
         contextMenuTextColor: '#bca45c',
         contextMenuBackgroundColorHover: '#771a0e',
-        // contextMenuTextColorHover: '#d8bb66',
-        contextMenuTextColorHover: '#f00',
+        contextMenuTextColorHover: '#d8bb66',
+        contextMenuItemHeight: 0,
+        contextMenuMinWidth: 100,
+        // contextMenuTextColorHover: '#f00',
 
         contextMenuBorderColor: '#372e24',
+        drawingModeX: 0,
+        drawingModeY: 0,
+        drawingModeSize: 0,
+        drawingModeDefaultSize: 20,
+        drawingModePreviewStyle: 'rgba(255, 0,0,1)',
+        drawingModeSizeIncrease: 1,
+        drawingModeMaxSize: 100,
+        drawingModeMinSize: 10,
+        drawinModeAngle: 0
         
     }
 

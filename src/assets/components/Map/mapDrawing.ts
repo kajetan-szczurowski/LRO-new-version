@@ -7,32 +7,60 @@ export function drawAll(map: mapType){
     drawMeasure(map);
     drawMapBorderGraphic(map);
     drawMiniMap(map);
+    drawDrawingModePreview(map);
     drawPing(map);
-    map.frameDrawing = false;
     drawContextMenu(map);
+    map.frameDrawing = false;
 
 }
 
+function drawDrawingModePreview(map: mapType){
+    if (!map.drawingModeShape) return;
+    switch (map.drawingModeShape){
+        case 'circle':
+            drawPreviewCircle(map);
+            break;
+        
+        case 'cone':
+            drawPreviewCone(map);
+            break;
+    }
+}
+
+function drawPreviewCircle(map: mapType){
+    drawCircle({canvasContext: map.canvas, x: map.drawingModeX, y: map.drawingModeY, 
+        radius: map.drawingModeSize, fillStyle: map.drawingModePreviewStyle});
+}
+
+function drawPreviewCone(map: mapType){
+    drawCone({canvasContext: map.canvas, x: map.drawingModeX, y: map.drawingModeY, radius: map.drawingModeSize, fillStyle: map.drawingModePreviewStyle,
+        angle: map.drawinModeAngle});
+}
+
 function drawContextMenu(map: mapType){
-    // return;
     if (!map.isContextMenuOpened) return;
     if (!map.contextMenuX || !map.contextMenuY || !map.contextMenuWidth || !map.contextMenuHeight) return;
     if (!map.choosenContextMenu || ! map.contexMenuFontStyle ) return;
 
-    // drawRectangle({canvasContext: map.canvas, x:map.mouseX - map.mapContextMenuWidth / 2, y:map.mouseY - map.mapContextMenuHeight / 2, 
-    //                    width: map.mapContextMenuWidth, height: map.mapContextMenuHeight, strokeStyle: '#372e24', lineWidth: 2, fillStyle: '#493f32'});
     drawRectangle({canvasContext: map.canvas, x:map.contextMenuX, y:map.contextMenuY, width: map.contextMenuWidth, 
             height:map.contextMenuHeight, strokeStyle: map.contextMenuBorderColor,
              lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH, fillStyle: map.contextMenuBackgroundColor});
-    // console.log(map.measureFont)
-    let textY = map.contextMenuY + map.contextMargin;
 
+    let textY = map.contextMenuY + map.contextMargin;
     let label: string;
+    const textX = map.contextMenuX + map.contextMargin; 
     for (let index = 0; index < map.choosenContextMenu.length; index++){
+
+        if (index === map.selectedContextMenuItem) 
+            drawRectangle({canvasContext: map.canvas, x: textX, y: textY, height: map.contextMenuItemHeight, 
+                width: map.contextMenuWidth - 2*map.contextMargin, fillStyle: map.contextMenuBackgroundColorHover});
+
         textY += map.contextMenuFontSize;
         label = map.choosenContextMenu[index].label; 
         const textColor = index === map.selectedContextMenuItem? map.contextMenuTextColorHover: map.contextMenuTextColor;
-        writeText({canvasContext: map.canvas, x:map.contextMenuX + map.contextMargin, y: textY, font: map.contexMenuFontStyle, 
+        
+
+        writeText({canvasContext: map.canvas, x:textX, y: textY, font: map.contexMenuFontStyle, 
             fillStyle: textColor, text: label})
         textY += map.contextItemsDistance;
     }
@@ -185,6 +213,24 @@ function drawLine({canvasContext, x1, y1, x2, y2, strokeStyle = undefined, lineW
     }
 }
 
+function drawCone({canvasContext, x, y, radius, angle, fillStyle = undefined, strokeStyle = undefined}: coneDrawingType){
+    canvasContext.beginPath();
+    canvasContext.moveTo(x, y); 
+    canvasContext.arc(x, y, radius, angle, 0.5 * Math.PI + angle);
+    if (fillStyle){
+        canvasContext.fillStyle = fillStyle;
+        canvasContext.fill();
+        return;
+    }
+
+    if (strokeStyle){
+        canvasContext.strokeStyle = strokeStyle;
+        canvasContext.stroke();
+        return;
+    }
+
+}
+
 function drawCircle({canvasContext, x, y, radius, strokeStyle, fillStyle}: circleDrawingType){
     drawArc({canvasContext: canvasContext, x: x, y: y, radius: radius,
             strokeStyle: strokeStyle, fillStyle: fillStyle,
@@ -251,6 +297,10 @@ type arcDrawingType = circleDrawingType &{
     endAngle: number,
     counterClockwise?: boolean,
 
+}
+
+type coneDrawingType = circleDrawingType &{
+    angle: number
 }
 
 type lineDrawingType = {

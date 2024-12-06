@@ -80,7 +80,7 @@ function getDefaultRightClickMenu() : rightClickMenuType{
 }
 
 function drawContextMenu(map: mapType){
-    map.choosenContextMenu = [{label: 'Line', event: () => {console.log('line')} }, { label: 'Circle', event: (map: mapType) => chooseDrawingShape(map, 'circle') },
+    map.choosenContextMenu = [{label: 'Line', event: (map: mapType) => chooseDrawingShape(map, 'line') }, { label: 'Circle', event: (map: mapType) => chooseDrawingShape(map, 'circle') },
         { label: 'Cone', event: (map: mapType) => chooseDrawingShape(map, 'cone') }
     ];
     setContextMenu(map);

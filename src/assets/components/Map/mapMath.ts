@@ -9,3 +9,7 @@ export function feetsToMeters(feets: number){
 export function hypotenuseFromPitagoras(adjoining1: number, adjoining2: number){
     return Math.sqrt(adjoining1 * adjoining1 + adjoining2 * adjoining2);
 }
+
+export function degreesToRadians(degrees: number){
+    return degrees * Math.PI / 180;
+}

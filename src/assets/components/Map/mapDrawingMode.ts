@@ -1,4 +1,5 @@
 import { mapType } from "./mapTypes"
+import { degreesToRadians } from "./mapMath";
 
 export function handleDrawingMode(map: mapType){
     if (!map.drawingModeShape || map.drawingModeShape === "") return;
@@ -31,8 +32,23 @@ function controlDrawingMode(map: mapType, order: string){
             map.drawingModeSize = Math.max(map.drawingModeSize - map.drawingModeSizeIncrease, map.drawingModeMinSize);
             break;
         }
-        
+        case "ROTATE_POSITIVE": {
+            map.drawinModeAngle = map.drawinModeAngle + map.drawingModeAngleIncrease;
+            break;
+        }
+        case "ROTATE_NEGATIVE": {
+            map.drawinModeAngle = map.drawinModeAngle - map.drawingModeAngleIncrease;
+            break;
+        }
     }
+    map.drawinModeAngle = getLimitedDrawingAngle(map.drawinModeAngle, map.drawingModeMinAngle, map.drawingModeMaxAngle);
+    map.drawingModeAngleRadians = degreesToRadians(map.drawinModeAngle);
+}
+
+function getLimitedDrawingAngle(angle: number, min: number, max: number): number {
+    if (angle > max) return min;
+    if (angle < min) return max;
+    return angle;
 }
 
 function getDrawingControls(){
@@ -51,7 +67,8 @@ function handleCircular(map: mapType){
 }
 
 function handleLine(map: mapType){
-
+    map.drawingModeX = map.mouseX - map.drawingModeSize / 2;
+    map.drawingModeY = map.mouseY;
 }
 
 export type ShapeNames = 'circle' | 'line' | 'cone'

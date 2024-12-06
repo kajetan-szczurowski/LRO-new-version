@@ -117,7 +117,12 @@ export type mapType = assetType & {
     drawingModeSizeIncrease: number,
     drawingModeMaxSize: number,
     drawingModeMinSize: number,
-    drawinModeAngle: number
+    drawinModeAngle: number,
+    drawingModeAngleRadians: number,
+    drawingModeAngleIncrease: number,
+    drawingModeMaxAngle: number,
+    drawingModeMinAngle: number
+
     
 }
 
@@ -185,8 +190,11 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         drawingModeSizeIncrease: 1,
         drawingModeMaxSize: 100,
         drawingModeMinSize: 10,
-        drawinModeAngle: 0
-        
+        drawinModeAngle: 0,
+        drawingModeAngleRadians: 0,
+        drawingModeAngleIncrease: 1,
+        drawingModeMaxAngle: 359,
+        drawingModeMinAngle: 0        
     }
 
     return returned;

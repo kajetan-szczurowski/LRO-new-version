@@ -24,6 +24,10 @@ function drawDrawingModePreview(map: mapType){
         case 'cone':
             drawPreviewCone(map);
             break;
+
+        case 'line':
+            drawPreviewLine(map);
+            break;
     }
 }
 
@@ -34,7 +38,15 @@ function drawPreviewCircle(map: mapType){
 
 function drawPreviewCone(map: mapType){
     drawCone({canvasContext: map.canvas, x: map.drawingModeX, y: map.drawingModeY, radius: map.drawingModeSize, fillStyle: map.drawingModePreviewStyle,
-        angle: map.drawinModeAngle});
+        radians: map.drawingModeAngleRadians});
+}
+
+function drawPreviewLine(map: mapType){
+    if (map.drawingModeAngleRadians) map.canvas.translate(map.mouseX, map.mouseY);
+    drawLine({canvasContext: map.canvas, x1: map.drawingModeX, y1: map.drawingModeY, 
+            x2: map.drawingModeX + map.drawingModeSize, y2: map.drawingModeY, lineWidth: 2, 
+            strokeStyle: map.drawingModePreviewStyle, rotationRadians: map.drawingModeAngleRadians
+    })
 }
 
 function drawContextMenu(map: mapType){
@@ -202,21 +214,23 @@ function writeText({canvasContext, x, y, fillStyle = undefined, font, text, text
 
 }
 
-function drawLine({canvasContext, x1, y1, x2, y2, strokeStyle = undefined, lineWidth = undefined}:lineDrawingType){
+function drawLine({canvasContext, x1, y1, x2, y2, strokeStyle = undefined, lineWidth = undefined, rotationRadians = 0}:lineDrawingType){
     if (lineWidth && strokeStyle){
         canvasContext.lineWidth = lineWidth;
         canvasContext.strokeStyle = strokeStyle;
         canvasContext.beginPath();
+        if (rotationRadians) canvasContext.rotate(rotationRadians);
         canvasContext.moveTo(x1, y1);
         canvasContext.lineTo(x2, y2);
         canvasContext.stroke();
+        if (rotationRadians) canvasContext.resetTransform();
     }
 }
 
-function drawCone({canvasContext, x, y, radius, angle, fillStyle = undefined, strokeStyle = undefined}: coneDrawingType){
+function drawCone({canvasContext, x, y, radius, radians, fillStyle = undefined, strokeStyle = undefined}: coneDrawingType){
     canvasContext.beginPath();
     canvasContext.moveTo(x, y); 
-    canvasContext.arc(x, y, radius, angle, 0.5 * Math.PI + angle);
+    canvasContext.arc(x, y, radius, radians, 0.5 * Math.PI + radians);
     if (fillStyle){
         canvasContext.fillStyle = fillStyle;
         canvasContext.fill();
@@ -300,7 +314,7 @@ type arcDrawingType = circleDrawingType &{
 }
 
 type coneDrawingType = circleDrawingType &{
-    angle: number
+    radians: number
 }
 
 type lineDrawingType = {
@@ -311,6 +325,7 @@ type lineDrawingType = {
     y2: number,
     strokeStyle?:string,
     lineWidth?: number
+    rotationRadians?: number
 }
 
 type textWritingType = {

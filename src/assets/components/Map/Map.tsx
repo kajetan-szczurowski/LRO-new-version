@@ -3,6 +3,7 @@ import { getMainMapPresets, characterType } from "./mapTypes";
 import { useSocket } from "../../providers/SocketProvider";
 import { mapType } from "./mapTypes";
 import * as geometry from "./mapMath";
+import { getDrawingData } from "./mapDrawingMode";
 
 
 
@@ -71,7 +72,12 @@ export default function Map() {
         mapData.pingX = args[0];
         mapData.pingY = args[1];
         mapData.startPing = true;
+        return;
 
+      }
+
+      case 'new-drawing-order': {
+        socket.emit('drawing-proposal', getDrawingData(mapData));
       }
     }
   }

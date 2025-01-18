@@ -55,6 +55,7 @@ export function handleMeasure(map:mapType){
     const enable = map.pressedKeys[map.presets.START_MEASURE_KEY] || map.pressedKeys[map.presets.START_MEASURE_KEY.toUpperCase()];
     const disable = map.pressedKeys[map.presets.STOP_MEASURE_KEY] || map.pressedKeys[map.presets.STOP_MEASURE_KEY.toUpperCase()];
 
+    if (map.drawingModeShape) return;
 
     if ((!enable && !disable) || (enable && disable)) return;
     if ((map.measuring && enable) || !map.measuring && disable) return;
@@ -232,6 +233,11 @@ function handleClick(map: mapType){
         } 
     }
 
+    if (map.drawingModeShape){
+        map.controllFunction('new-drawing-order', [map.absoluteMouseX, map.absoluteMouseY], map);
+        resetDrawingModeShape(map);
+    }
+
     if (activeIndex === '' || !activeSide) return;
     map.activeSide = activeSide;
     startMeasuring(map);
@@ -243,6 +249,8 @@ function handleClick(map: mapType){
 
         else char.active = false;
     })
+
+
 }
 
 function handleDoubleClick(map: mapType){

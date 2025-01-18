@@ -121,7 +121,10 @@ export type mapType = assetType & {
     drawingModeAngleRadians: number,
     drawingModeAngleIncrease: number,
     drawingModeMaxAngle: number,
-    drawingModeMinAngle: number
+    drawingModeMinAngle: number,
+    drawingModeLinePoint1? : {x: number, y: number},
+    drawingModeLinePoint2? : {x: number, y: number}
+
 
     
 }

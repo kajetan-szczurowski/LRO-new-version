@@ -29,6 +29,7 @@ function drawDrawingModePreview(map: mapType){
             drawPreviewLine(map);
             break;
     }
+    writeMeasureText(map);
 }
 
 function drawPreviewCircle(map: mapType){
@@ -42,11 +43,13 @@ function drawPreviewCone(map: mapType){
 }
 
 function drawPreviewLine(map: mapType){
-    if (map.drawingModeAngleRadians) map.canvas.translate(map.mouseX, map.mouseY);
-    drawLine({canvasContext: map.canvas, x1: map.drawingModeX, y1: map.drawingModeY, 
-            x2: map.drawingModeX + map.drawingModeSize, y2: map.drawingModeY, lineWidth: 2, 
-            strokeStyle: map.drawingModePreviewStyle, rotationRadians: map.drawingModeAngleRadians
-    })
+    if (!map.drawingModeLinePoint1 || !map.drawingModeLinePoint2) return;
+    const x1 = map.drawingModeLinePoint1.x;
+    const y1 = map.drawingModeLinePoint1.y;
+    const x2 = map.drawingModeLinePoint2.x;
+    const y2 = map.drawingModeLinePoint2.y;
+    drawLine({canvasContext: map.canvas, x1: x1, y1: y1, x2: x2, y2: y2, lineWidth: 6, 
+            strokeStyle: map.drawingModePreviewStyle});
 }
 
 function drawContextMenu(map: mapType){
@@ -214,16 +217,14 @@ function writeText({canvasContext, x, y, fillStyle = undefined, font, text, text
 
 }
 
-function drawLine({canvasContext, x1, y1, x2, y2, strokeStyle = undefined, lineWidth = undefined, rotationRadians = 0}:lineDrawingType){
+function drawLine({canvasContext, x1, y1, x2, y2, strokeStyle = undefined, lineWidth = undefined}:lineDrawingType){
     if (lineWidth && strokeStyle){
         canvasContext.lineWidth = lineWidth;
         canvasContext.strokeStyle = strokeStyle;
         canvasContext.beginPath();
-        if (rotationRadians) canvasContext.rotate(rotationRadians);
         canvasContext.moveTo(x1, y1);
         canvasContext.lineTo(x2, y2);
         canvasContext.stroke();
-        if (rotationRadians) canvasContext.resetTransform();
     }
 }
 

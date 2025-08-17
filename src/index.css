@@ -207,7 +207,7 @@ ol{
   content: ': ';
 }
 
-#character-info input{
+#character-info input[type=text]{
   width: 100%;
 }
 
@@ -351,6 +351,10 @@ ul li{
   font-family: Fondamento;
   color: var(--main-text-color);
   margin-left: 1rem;
+}
+
+.edit-button{
+  color: var(--main-text-color);
 }
 
 .character-box-button:hover, .delete-button:hover{
@@ -691,6 +695,136 @@ span[class^="rolls-family-visibility-"]{
   flex-wrap: wrap;
 }
 
+.drawing-info-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.drawing-info-wrapper{
+  margin-bottom: 2rem;
+}
+
+.drawing-info-wrapper h3{
+  text-transform: capitalize;
+}
+
+
+.drawing-color-picker:hover{
+  cursor: pointer;
+}
+
+.color-picker-color-box{
+  /* margin-left: 0.5rem; */
+  /* margin-right: 0.5rem; */
+  background-color: rgba(0,0,0,0);
+  border: none;
+  padding: 0;
+}
+
+div.color-picker-color-box{
+  width: 20px;
+  height: 20px;
+}
+
+input.color-picker-color-box{
+  width: 22px;
+  height: 25px;
+}
+
+.color-picker-row{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-picker-label{
+  min-width: 95px;
+}
+
+
+.drawing-info-column{
+  margin-right: 2rem;
+  line-height: 1.5;
+}
+
+.drawing-buttons{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.delete-drawing-button{
+  margin-left: 0.2rem;
+  margin-right: 1rem;
+}
+
+.drawing-color-span{
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+}
+
+.drawings-counter{
+  text-align: end;
+  margin-right: 1rem;
+}
+
+.settings-buttons{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.5rem;
+}
+
+.settings-dialog{
+  background-image: url('./assets/graphics/characterBoxSmall.jpg');
+  border: 4px solid #372e24;
+  color: var(--main-text-color);
+}
+
+.settings-button{
+  text-transform: none;
+}
+
+.settings-color-picker{
+  background: none;
+}
+
+.condition-picker-dialog{
+  width: 800px;
+  height: 800px;
+}
+
+.condition-picker-grid-group{
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 1rem;
+}
+
+.assets-condition-cart{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 1rem;
+}
+
+.asset-wrapper{
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.asset-label-button{
+  display: flex;
+  flex-direction: column;
+}
+
+.assets-current-condition{
+  margin-left: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 0.5rem;
+}
 
 @media (max-width: 800px){
   body {

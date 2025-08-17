@@ -49,10 +49,16 @@ export default function HP() {
 
 }
 
-type hpType = {
+export type hpType = {
     graphicUrl : string,
     currentHP : number,
     maxHP : number,
     name: string,
-    id: string
+    id: string,
+    conditions?: Condition[]
+}
+
+export type Condition = {
+    label: string,
+    force: number
 }

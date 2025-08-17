@@ -39,7 +39,6 @@ export default function RollsFamily({data, filtered, rolledDictionary}: props) {
 
       function handleChunkClick(){
         chatInputSignal.value = {modifier: String(rollData.value), description: String(rollData.name), isAppendix: isModifierAppendix()};
-
         function isModifierAppendix(){ if (!rollData.family) return false; return (rollData.family === 'modifiers');}
       }
 

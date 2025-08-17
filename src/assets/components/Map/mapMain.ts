@@ -43,6 +43,7 @@ function performMapLogic(map: mapType, charactersSource: characterType[]){
     if (map.currentGraphicUrl !== map.graphicUrl) loadImage(map);
     if (map.presets.BORDER_GRAPHIC_URL && !map.borderImg) loadBorderImg(map)
     if (!map.visibleWidth || map.resized) calculateCanvasSize(map);
+    if (!map.deadAssetImage.img) loadImage(map.deadAssetImage);
     controls.handleScrolling(map);
     checkForCharacters(map,charactersSource);
     characters.handleCharacters(map);

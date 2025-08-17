@@ -30,7 +30,8 @@ export default function Login() {
         characterMapSignal.value = loginData.authorization;
         setUserName(loginData.userName);
         usersDataState.value = {userID: IdToInsert || '', isGM: loginData.isGM,
-            currentCharacterID: usersDataState.value.currentCharacterID, namesIDMap: loginData.nameIDsMap, charactersMap: loginData.authorization};
+            currentCharacterID: usersDataState.value.currentCharacterID, namesIDMap: loginData.nameIDsMap, charactersMap: loginData.authorization,
+            userName: loginData.userName};
     })
 
     return (
@@ -68,7 +69,7 @@ export default function Login() {
         sessionStorage.setItem(SESSION_STORAGE_KEY, "");
         characterMapSignal.value = {};
         setUserName(DEFAULT_USERNAME);
-        usersDataState.value = {userID: '', isGM: false, currentCharacterID: usersDataState.value.currentCharacterID, namesIDMap: {}, charactersMap: {}};
+        usersDataState.value = {userID: '', isGM: false, currentCharacterID: usersDataState.value.currentCharacterID, namesIDMap: {}, charactersMap: {}, userName: ''};
     }
 
 }

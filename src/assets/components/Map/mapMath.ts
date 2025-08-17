@@ -13,3 +13,19 @@ export function hypotenuseFromPitagoras(adjoining1: number, adjoining2: number){
 export function degreesToRadians(degrees: number){
     return degrees * Math.PI / 180;
 }
+
+export function radiansToDegrees(radians: number){
+    return radians * 180 / Math.PI;
+}
+
+export function angleBetweenTwoPoints(cornerX: number, cornerY: number, x1: number, y1: number, x2: number, y2: number){
+    //Law of Cosines
+    const a = euclideanDistance(x1, y1, cornerX, cornerY);
+    const b = euclideanDistance(cornerX, cornerY, x2, y2);
+    const c = euclideanDistance(x1, y1, x2, y2);
+    if (!a || !b || !c) return 0;
+    const numerator = a * a + b * b - c * c;
+    const denominator = 2 * a * b;
+    const cosines = numerator / denominator;
+    return Math.acos(cosines);
+} 

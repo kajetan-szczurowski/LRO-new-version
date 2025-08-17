@@ -1,9 +1,11 @@
 import ProgressBar from './ProgressBar'
 import { usersDataState } from '../../states/GlobalState'
+import { Condition } from './HP';
 
 export default function CharacterNumberBar({graphicURL, maxValue, currentValue, barForegroundClassName, label, socketEditKey, id} : props) {
 const authorized = checkAuthorization(id, label);
-console.log(label, authorized);
+
+
 return(
     <div className='hp-list-item'>
         <img src = {graphicURL} className = 'hp-list-img'/>
@@ -15,6 +17,7 @@ return(
         </div>
     </div>
 )
+
 
 
 }
@@ -36,5 +39,6 @@ type props = {
     barForegroundClassName: string,
     label: string,
     socketEditKey: string,
-    id: string
+    id: string,
+    conditions?: Condition[]
 }

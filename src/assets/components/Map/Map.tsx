@@ -78,6 +78,32 @@ export default function Map() {
 
       case 'new-drawing-order': {
         socket.emit('drawing-proposal', getDrawingData(mapData));
+        return;
+      }
+
+      case 'delete-drawing-order': {
+        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
+        const id = mapData.editingDrawing.id;
+        const drawingOwner = mapData.editingDrawing.userName;
+        socket.emit('delete-drawing', {userID: loggedUserID, drawingID: id, owner: drawingOwner});
+        return;
+
+      }
+
+      case 'edit-drawing-order': {
+        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
+        const {linePoint1, linePoint2, angle, size} = getDrawingData(mapData);
+        const [x, y] = [mapData.editingDrawing.x, mapData.editingDrawing.y];
+        const drawingLine = mapData.editingDrawing.shapeType === 'line';
+        const pointPayload = drawingLine? {x1: linePoint1?.x, x2: linePoint2?.x, y1: linePoint1?.y, y2: linePoint2?.y} : {};
+        const payload = {drawingID: mapData.editingDrawing.id, x: x, y: y, size: size / 10, angle: angle, ...pointPayload};
+        socket.emit('edit-drawing', {userID: loggedUserID, ...payload, owner: mapData.editingDrawing.userName});
+        return;
+      }
+
+      case 'drawings':{
+        mapData.drawnShapes = args;
+        mapData.toBeRedrawn = true;
       }
     }
   }

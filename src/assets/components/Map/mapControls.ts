@@ -1,14 +1,19 @@
-import { mapType } from "./mapTypes"
+import { getDefaultDrawing, mapType } from "./mapTypes"
 import { isMouseOnCharacter } from "./mapCharacters";
 import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
-import { initContextMenu, handleRightMenuMouseDown, closeContextMenu } from "./mapRightClickMenu";
-import { handleDrawingMode, resetDrawingModeShape } from "./mapDrawingMode";
+import { initContextMenu, handleRightMenuMouseDown, closeContextMenu, drawingSelectedContextMenu } from "./mapRightClickMenu";
+import { findLineCenter, findLineSize, handleDrawingMode, isMouseOnDrawing, resetDrawingSelection, setDrawingSelectionData } from "./mapDrawingMode";
+import { usersDataState } from "../../states/GlobalState";
 
 export function canvasEventListeners(map: mapType){
     map.rawCanvas.addEventListener('mousemove', (e) => handleMouseMove(e, map));
     map.rawCanvas.addEventListener('mouseout', () => {map.mouseOnMap = false});
     map.rawCanvas.addEventListener('click', () => handleClick(map));
+    map.rawCanvas.addEventListener('mousedown', () => handleMouseDown(map));
+    map.rawCanvas.addEventListener('mouseup', () => handleMouseUp(map));
+
+
     map.rawCanvas.addEventListener('contextmenu', (e) => handleContextMenu(e, map));
     map.rawCanvas.addEventListener('dblclick', () => handleDoubleClick(map));
     // map.rawCanvas.ondblclick(() => handleDoubleClick(map));
@@ -55,7 +60,7 @@ export function handleMeasure(map:mapType){
     const enable = map.pressedKeys[map.presets.START_MEASURE_KEY] || map.pressedKeys[map.presets.START_MEASURE_KEY.toUpperCase()];
     const disable = map.pressedKeys[map.presets.STOP_MEASURE_KEY] || map.pressedKeys[map.presets.STOP_MEASURE_KEY.toUpperCase()];
 
-    if (map.drawingModeShape) return;
+    // if (map.drawingModeShape) return;
 
     if ((!enable && !disable) || (enable && disable)) return;
     if ((map.measuring && enable) || !map.measuring && disable) return;
@@ -75,6 +80,84 @@ function handleMoveOverflow(map: mapType){
             map.distanceOverflowing = true;
     }
 
+}
+
+function handleRotatingDrawing(map: mapType){
+    //TODO: use contants insted of magic numbers and magic strings
+    if (map.drawingMoving.ready) return;
+
+    if (!map.drawingSelectionRectangle){
+        document.body.style.cursor = 'auto';
+        map.drawingRotating.ready = false;
+        return;
+    }
+
+    const xPoint = map.drawingSelectionRectangle.x + map.drawingSelectionRectangle.width;
+    const yPoint = map.drawingSelectionRectangle.y;
+    const mouseInPlaceX = valueIsInProximity(map.absoluteMouseX, xPoint, 10);
+    const mouseInPlaceY = valueIsInProximity(map.absoluteMouseY, yPoint, 10);
+    if (mouseInPlaceX && mouseInPlaceY && map.editingDrawingOperation != "rotating" ){
+        document.body.style.cursor = 'grab';
+        map.drawingRotating.ready= true;
+        return;
+    }
+
+    map.drawingRotating.ready= false;
+
+}   
+
+function handleMovingDrawing(map: mapType){
+    //TODO: use contants insted of magic numbers and magic strings
+    if (map.editingDrawingOperation === "moving") return;
+    if (map.editingDrawingOperation === 'rotating') return;
+    if (!map.editingDrawing.userName) return;
+    const xOk = valueIsInProximity(map.absoluteMouseX, map.editingDrawing.x, 10);
+    const yOk = valueIsInProximity(map.absoluteMouseY, map.editingDrawing.y, 10);
+    if (xOk && yOk){
+        document.body.style.cursor = 'all-scroll';
+        map.drawingMoving.ready= true;
+        return;
+    }
+
+    document.body.style.cursor = 'auto';
+    map.drawingMoving.ready = false;
+
+}
+
+function handleResizingDrawing(map: mapType){
+    //TODO: use contants insted of magic numbers and magic strings
+    if (!map.drawingSelectionRectangle) return;
+    if (map.drawingSelectionRectangle.width === 0) return;
+    if (!map.editingDrawing.userName) return;
+    if (map.drawingMoving.ready) return;
+    if (map.editingDrawingOperation === 'moving' || map.editingDrawingOperation === 'rotating') return
+
+    if(map.editingDrawingOperation === 'resizing' ){
+        map.drawingResizng.currentPoint = {x: map.absoluteMouseX, y: map.absoluteMouseY};
+    }
+
+
+    if (!map.drawingSelectionRectangle){
+        document.body.style.cursor = 'auto';
+        map.drawingResizng.ready = false;
+        return;
+    } 
+    const leftXOk = valueIsInProximity(map.absoluteMouseX, map.drawingSelectionRectangle.x, 10);
+    const rightXOk = valueIsInProximity(map.absoluteMouseX, map.drawingSelectionRectangle.x + map.drawingSelectionRectangle.width, 10);
+    const yNotOk = map.absoluteMouseY < map.drawingSelectionRectangle.y || map.absoluteMouseY > map.drawingSelectionRectangle.y + map.drawingSelectionRectangle.height;
+    if ((!leftXOk && ! rightXOk) || yNotOk){
+         document.body.style.cursor = 'auto';
+         map.drawingResizng.ready = false;
+        return;
+    }
+    document.body.style.cursor = 'w-resize';
+    map.drawingResizng.ready = true;
+}
+
+function valueIsInProximity(valueToCheck: number, pointToCompare: number, proximity: number){
+    const smallOK = pointToCompare - proximity < valueToCheck;
+    const bigOK = pointToCompare + proximity > valueToCheck;
+    return smallOK && bigOK;
 }
 
 
@@ -119,8 +202,15 @@ function handleContextMenu(e:MouseEvent, map:mapType){
     for(let i = map.assets.length - 1; i >= 0; i--){
         if (isMouseOnCharacter(map, map.assets[i])){
             map.controllFunction('delete-asset', [map.assets[i].id]);
+            return;
         }
     }
+
+    if (map.editingDrawing.id){
+        drawingSelectedContextMenu(map);
+        return;
+    }
+
     initContextMenu(map);
 
 }
@@ -196,10 +286,42 @@ function handleMapBorderLogic(map:mapType){
 
 }
 
+function handleMouseUp(map: mapType){
+    map.editingDrawingOperation = '';
+}
 
+function handleMouseDown(map: mapType){
+    map.lastMouseDownTime = Date.now();
+    map.lastPointOfMouseDown = {x: map.absoluteMouseX, y: map.absoluteMouseY};
+    if (!map.drawingResizng.ready && !map.drawingRotating.ready && !map.drawingMoving.ready) return;
+
+    if (map.editingDrawingOperation !== 'resizing' && map.drawingResizng.ready && !map.drawingRotating.ready){
+        map.editingDrawingOperation = 'resizing';
+        map.drawingResizng.initialDistance = mapMath.euclideanDistance(map.absoluteMouseX, map.absoluteMouseY, map.editingDrawing.x, map.editingDrawing.y);
+        map.drawingResizng.initialSize = map.editingDrawing.size;
+        map.drawingHasChanged = true;
+        return;
+    }
+
+    if (map.editingDrawingOperation !== 'rotating'  && map.drawingRotating.ready){
+        map.editingDrawingOperation = 'rotating';
+        map.drawingRotating.referencePoint = {x: map.absoluteMouseX, y: map.absoluteMouseY};
+        map.drawingRotating.previousPoint = {x: map.absoluteMouseX, y: map.absoluteMouseY};
+        map.drawingRotating.initialAngle = map.editingDrawing.angle;
+        document.body.style.cursor = 'grabbing';
+        map.drawingHasChanged = true;
+        return;
+    }
+
+     if (map.editingDrawingOperation !== 'moving'  && map.drawingMoving.ready){
+        map.editingDrawingOperation = 'moving';
+        map.drawingHasChanged = true;
+        return;
+    }
+
+}
 
 function handleClick(map: mapType){
-
     if (map.isContextMenuOpened){
         handleRightMenuMouseDown(map);
         return;
@@ -224,31 +346,73 @@ function handleClick(map: mapType){
 
     let activeIndex = '';
     let activeSide: number | undefined = 0; 
-    for(let i = map.assets.length - 1; i >= 0; i--){
-        if (isMouseOnCharacter(map, map.assets[i])){
-            activeIndex = map.assets[i].id;
-            activeSide = map.assets[i].size;
-            map.activeAssetId = map.assets[i].id;
-            break;
-        } 
-    }
-
-    if (map.drawingModeShape){
-        map.controllFunction('new-drawing-order', [map.absoluteMouseX, map.absoluteMouseY], map);
-        resetDrawingModeShape(map);
-    }
-
-    if (activeIndex === '' || !activeSide) return;
-    map.activeSide = activeSide;
-    startMeasuring(map);
-    map.assets.forEach(char => {
-        if (char.id === activeIndex) {
-            char.active? char.active = false: char.active = true;
-            if (!char.active) map.activeSide = 0;
+    if (!map.drawingSelected && !map.pressedKeys[map.presets.PREVENT_SELECTING_CHARACTERS_KEY])
+        for(let i = map.assets.length - 1; i >= 0; i--){
+            if (isMouseOnCharacter(map, map.assets[i])){
+                activeIndex = map.assets[i].id;
+                activeSide = map.assets[i].size;
+                map.activeAssetId = map.assets[i].id;
+                break;
+            } 
         }
+
+    if (activeIndex !== '' && activeSide){
+        map.activeSide = activeSide;
+        startMeasuring(map);
+        map.assets.forEach(char => {
+            if (char.id === activeIndex) {
+                char.active? char.active = false: char.active = true;
+                if (!char.active) map.activeSide = 0;
+            }
 
         else char.active = false;
     })
+    return;
+    }
+
+
+    if (map.newDrawingInProgress){
+        map.controllFunction('new-drawing-order', [map.absoluteMouseX, map.absoluteMouseY], map);
+        map.editingDrawingOperation = '';
+        map.editingDrawing = getDefaultDrawing();
+        map.newDrawingInProgress = false;
+        return;
+    }
+
+    const userName = usersDataState.value.userName;
+    const isGM = usersDataState.value.isGM;
+    let drawnItem = getDefaultDrawing();
+    let currentOwner = '';
+    for(let i = map.drawnShapes.length - 1; i >= 0; i--){
+        if (map.editingDrawing.userName) break;
+        currentOwner = map.drawnShapes[i].userName;
+        if (userName !== currentOwner) if (!isGM) continue;
+        const drawings = map.drawnShapes[i].shapes;
+        for(let j = drawings.length -1; j >= 0; j--){
+            drawnItem = drawings[j];
+            if (isMouseOnDrawing(map, drawnItem)){
+                map.editingDrawing = drawnItem;
+                map.editingDrawing.userName = currentOwner;
+                setDrawingSelectionData(map);
+                if (map.editingDrawing.shapeType === 'line') findLineCenter(map);
+                if (map.editingDrawing.shapeType === 'line') findLineSize(map);
+                map.drawingSelected = true;
+                break;
+            }
+        }
+
+    }
+    const now = Date.now();
+    const timeDifference = now - map.lastMouseDownTime;
+    if (currentOwner === '' && timeDifference < map.presets.MOUSE_CLICK_TIME_FILTER){
+        if (map.drawingHasChanged){
+            map.drawingHasChanged = false;
+            map.controllFunction('edit-drawing-order', [map.absoluteMouseX, map.absoluteMouseY], map);
+        }
+        resetDrawingSelection(map);
+    }
+
+
 
 
 }
@@ -264,14 +428,13 @@ function handleDoubleClick(map: mapType){
 
 function handleEscapeButton(map: mapType){
     closeContextMenu(map);
-    resetDrawingModeShape(map);
+    map.editingDrawingOperation === '';
 }
 
 function handleKeyDown(evt:KeyboardEvent, map:mapType){
     if (typeof map.pressedKeys != 'object') return;
     map.pressedKeys[evt.key] = true;
     if (evt.key === 'Escape') handleEscapeButton(map);
-    handleDrawingMode(map);
 }
 
 function handleMouseMove(e:MouseEvent, map:mapType){
@@ -284,7 +447,11 @@ function handleMouseMove(e:MouseEvent, map:mapType){
     map.absoluteMouseY = map.mouseY + map.sourceY - map.onCanvasY;
     handleMoveOverflow(map);
     handleDrawingMode(map);
-  
+    handleHP(map);
+    handleMovingDrawing(map);
+    handleResizingDrawing(map);
+    handleRotatingDrawing(map);
+    if (document.body.style.cursor !== 'auto' && !map.drawingSelected) document.body.style.cursor = 'auto';
 }
 
 function checkForScrolling(map:mapType, mousePosition: number, sideLength: number){
@@ -325,8 +492,83 @@ function moveMap(map: mapType, x:number, y:number){
     mapDataState.value.y = y;
 }
 
+
 export function limitValue(value: number, min: number, max: number){
     if (value < min) return min;
     if (value > max) return max;
     return value;
+}
+
+
+function handleHP(map: mapType){
+    //TODO: refactor, please
+    const isGM = usersDataState.value.isGM;
+    const showText = isGM; // place for text logics for ordinary players
+    let maxHP = 0;
+    let currentHP = 0;
+    let assetSize = 0;
+    for(let i = map.assets.length - 1; i >= 0; i--){
+        if (isMouseOnCharacter(map, map.assets[i])){
+            if (map.assets[i].maxHP && map.assets[i].currentHP !== null && map.assets[i].currentHP !== undefined){
+                if (map.assets[i].id === map.currentlyHoverAssetID) return;
+                map.currentlyHoverAssetID = map.assets[i].id;
+                assetSize = map.assets[i].size ?? map.presets.ASSET_SIZE; 
+                maxHP = map.assets[i].maxHP ?? 0;
+                currentHP = map.assets[i].currentHP ?? 0;
+                // map.HPBarX = map.onCanvasWidth / 2 - map.presets.HP_BAR_WIDTH / 2;
+                map.HPBarX = map.assets[i].x - map.x - map.presets.HP_BAR_WIDTH_OVERFLOW;
+                map.HPBarY = map.assets[i].y - map.y + assetSize + map.presets.HP_BAR_TOP_MARGIN;
+                map.HPBarWrapperWidth = assetSize + 2 * map.presets.HP_BAR_WIDTH_OVERFLOW;
+                map.HPBarFilledWidth = currentHP / maxHP * map.HPBarWrapperWidth;
+                if (isGM) map.HPBarText = `(${i}) ${currentHP}/${maxHP}`;
+                if (showText) map.HPBarTextX = map.HPBarX + map.HPBarWrapperWidth / 2;
+                map.maxAssetHP = maxHP;
+                map.currentAssetHP = currentHP;
+                }
+
+                //TODO: refactor, beacuse it assigns also conditions
+
+                const conditions = map.assets[i].conditions;
+                if (!conditions) return;
+                map.canvas.font = map.presets.CONDITION_FONT;
+                let counter = 0;
+                const assetX = map.assets[i].x + ((map.assets[i].size ?? 50) / 2);
+                const startX = assetX - map.presets.CONDITION_ROW_MAX_WIDTH / 2;
+                let currentX = startX;
+                let currentY = map.assets[i].y + (map.assets[i].size ?? 50) + 30;
+                let newWidth = 0;
+                let currentXForce = 0;
+                let widthDelta = 0;
+                let startIndex = 0;
+                map.HoveredCharacterConditions = [];
+                conditions?.forEach(cond => {
+                    if (map.HoveredCharacterConditions === undefined) return;
+                    newWidth = map.canvas.measureText(`${cond.force} ${cond.label} `).width + 10;
+                    currentXForce = currentX + map.canvas.measureText(`${cond.label}`).width + 5; 
+                    counter++;
+                    map.HoveredCharacterConditions?.push({x: currentX - map.x, y: currentY - map.y, width: newWidth, height: 25, forceX: currentXForce - map.x, ...cond});
+                    currentX += newWidth + 20;
+                    if (counter >= map.presets.MAX_CONDITIONS_PER_ROW){
+                        widthDelta = currentX - assetX - assetX + startX;
+                        currentX = startX;
+                        currentY += 30;
+                        counter = 0;
+                        if (widthDelta !==0){
+                            for (let j = startIndex; j < startIndex + map.presets.MAX_CONDITIONS_PER_ROW; j++){
+                                map.HoveredCharacterConditions[j].x -=  (widthDelta / map.presets.MAX_CONDITIONS_PER_ROW);
+                                map.HoveredCharacterConditions[j].forceX -=  (widthDelta / map.presets.MAX_CONDITIONS_PER_ROW);
+                            }
+                        }
+                    }
+                });
+
+                return;
+            }
+        map.HoveredCharacterConditions = [];
+        map.currentlyHoverAssetID = '';
+            
+    }
+    map.maxAssetHP = 0;
+    map.currentAssetHP = 0;
+
 }

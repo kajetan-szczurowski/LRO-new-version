@@ -1,5 +1,5 @@
 import { mapType, rightClickMenuType } from "./mapTypes";
-import { setDrawingModeShape, resetDrawingModeShape, ShapeNames } from "./mapDrawingMode";
+import { prepareNewDrawing, resetDrawingSelection, ShapeNames } from "./mapDrawingMode";
 
 export function handleRightClickMenu(map: mapType){
     if (!map.isContextMenuOpened) return;
@@ -46,12 +46,16 @@ export function closeContextMenu(map: mapType){
 
 
 export function initContextMenu(map: mapType){
+    prepareContextMenu(map);
+    map.choosenContextMenu = getDefaultRightClickMenu();
+    setContextMenu(map);
+    map.editingDrawingOperation === '';
+}
+
+function prepareContextMenu(map: mapType){
     map.isContextMenuOpened = true;
     map.contextMenuX = map.mouseX;
     map.contextMenuY = map.mouseY;
-    map.choosenContextMenu = getDefaultRightClickMenu();
-    setContextMenu(map);
-    resetDrawingModeShape(map);
 }
 
 function setContextMenu(map: mapType){
@@ -76,7 +80,7 @@ function mouseIsOnContextMenu(map: mapType){
 }
 
 function getDefaultRightClickMenu() : rightClickMenuType{
-    return[{label: 'Draw', event: (map: mapType) =>  drawContextMenu(map)}, {label: 'kopyto', event: () => {console.log('kopyto')}}]
+    return[{label: 'Draw', event: (map: mapType) =>  drawContextMenu(map)}]
 }
 
 function drawContextMenu(map: mapType){
@@ -86,7 +90,20 @@ function drawContextMenu(map: mapType){
     setContextMenu(map);
 }
 
+export function drawingSelectedContextMenu(map: mapType){
+    const eventFunction = (map: mapType) => {
+        map.controllFunction('delete-drawing-order', [], map);
+        map.drawingSelectionRectangle = undefined;
+        map.editingDrawingOperation = '';
+        closeContextMenu(map);
+        resetDrawingSelection(map);
+    };
+    map.choosenContextMenu = [{label: 'Delete', event: eventFunction}];
+    setContextMenu(map);
+    prepareContextMenu(map);
+}
+
 function chooseDrawingShape(map: mapType, shape: ShapeNames){
-    setDrawingModeShape(map, shape);
+    prepareNewDrawing(map, shape);
     closeContextMenu(map);
 }

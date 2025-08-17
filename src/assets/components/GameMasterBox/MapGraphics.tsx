@@ -2,6 +2,7 @@ import {useState, useRef} from 'react'
 import { useSocket } from '../../providers/SocketProvider'
 import { usersDataState } from '../../states/GlobalState';
 import { mapDataState } from '../../states/GlobalState';
+import { withInputFilter } from '../withInputFilter';
 
 export default function MapGraphics() {
     const userID = usersDataState.value.userID;
@@ -21,24 +22,16 @@ export default function MapGraphics() {
     socket.on('maps', maps => setMaps(maps.sort((a : assetType, b : assetType) => a.label.localeCompare(b.label) )));
     socket.on('assets', assets => setAssets(assets.sort((a : assetType, b : assetType) => a.label.localeCompare(b.label) )));
 
+    const MapsComponent = withInputFilter(MapsList);
+    const AssetsComponet = withInputFilter(AssetsList);
+
     if (!userIsGM) return(<></>)
 
     return(
       <>
         <section id = 'admin-box'>
-            <ol>
-                {maps.map(m => {
-                    console.log
-                    return(<li key = {m.label} className = 'character-box-clickable' onClick = {() => changeMap(m.url)}>{m.label}</li>)
-                })}
-            </ol>
-
-            <ol>
-                {assets.map(ass => {
-                    return(<li key = {ass.label} className = 'character-box-clickable' onClick = {() => addToMap(ass)}>{ass.label}</li>)
-                })}
-            </ol>
-
+            <MapsComponent/>
+            <AssetsComponet/>
             
             <input ref = {sizeRef}></input>
             <button onClick = {resetSize}>Reset size input</button>
@@ -52,6 +45,29 @@ export default function MapGraphics() {
       </>
 
     )
+
+    function MapsList({filter}: {filter: string}){
+        const filteredMaps = maps.filter(m => m.label.toLowerCase().includes(filter.toLowerCase()));
+        return(
+            <ol>
+                {filteredMaps.map(m => {
+                    return(<li key = {m.label} className = 'character-box-clickable' onClick = {() => changeMap(m.url)}>{m.label}</li>)
+                })}
+            </ol>
+        )    
+    }
+
+        function AssetsList({filter}: {filter: string}){
+        const filteredAssets = assets.filter(ass => ass.label.toLowerCase().includes(filter.toLowerCase()));
+        return(
+            <ol>
+                {filteredAssets.map(ass => {
+                    return(<li key = {ass.label} className = 'character-box-clickable' onClick = {() => addToMap(ass)}>{ass.label}</li>)
+                })}
+            </ol>
+        )    
+    }
+
 
     function resetSize(){
         if (!sizeRef.current) return;

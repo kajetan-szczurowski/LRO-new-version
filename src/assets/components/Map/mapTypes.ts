@@ -1,3 +1,22 @@
+import { DrawingData } from "./mapDrawingMode"
+
+export type Point = {
+    x: number,
+    y: number
+}
+
+export type CharacterCondition = {
+    label: string,
+    force: number,
+    id: string
+}
+
+export type ConditionDrawingData = Rectangle & CharacterCondition & {forceX: number};
+
+export type DrawingEditOperation = {
+    ready: boolean
+}
+
 export type assetType = {
     x: number,
     y: number,
@@ -21,7 +40,10 @@ export type characterType = assetType & {
     aimedY?: number,
     id: string,
     active?: boolean,
-    speed?: number
+    speed?: number,
+    currentHP?: number,
+    maxHP?: number,
+    conditions?: CharacterCondition[]
 }
 
 export type mapType = assetType & {
@@ -67,7 +89,7 @@ export type mapType = assetType & {
     miniMapCurrentY?: number,
     mouseOnMiniMap?: boolean,
     measuring: boolean,
-    measurePoint: {x: number, y: number},
+    measurePoint: Point,
     distance: {meters: string, feets:string},
     measureFont: string,
     measureLineWidth: number,
@@ -108,29 +130,54 @@ export type mapType = assetType & {
     contextMenuItemHeight: number,
     selectedContextMenuItem?: number,
     contextMenuMinWidth :number,
-    drawingModeShape? :string,
-    drawingModeX : number,
-    drawingModeY : number,
-    drawingModeSize: number,
-    drawingModeDefaultSize: number,
-    drawingModePreviewStyle: string,
-    drawingModeSizeIncrease: number,
+
     drawingModeMaxSize: number,
     drawingModeMinSize: number,
-    drawinModeAngle: number,
-    drawingModeAngleRadians: number,
-    drawingModeAngleIncrease: number,
     drawingModeMaxAngle: number,
     drawingModeMinAngle: number,
-    drawingModeLinePoint1? : {x: number, y: number},
-    drawingModeLinePoint2? : {x: number, y: number}
+    lastPointOfMouseDown : Point,
 
+    editingDrawing: DrawingData, 
+    drawingSelectionRectangle?: Rectangle,
 
+    editingDrawingOperation?: '' | 'resizing' | 'rotating' | 'moving',
+    drawingResizng: DrawingEditOperation & {initialPoint: Point, initialDistance: number, initialSize: number, currentPoint: Point},
+    drawingRotating: DrawingEditOperation & {referencePoint: Point, previousPoint: Point, initialAngle: number},
+    drawingMoving: DrawingEditOperation;
+    newDrawingInProgress? :boolean
+    drawingHasChanged?: boolean,
+    drawingSelected?: boolean,
+    lastMouseDownTime: number,
+
+    drawnShapes : shapesDrawnByUser[],
+    currentAssetHP?: number
+    maxAssetHP?: number
+    HPBarX: number,
+    HPBarY: number,
+    HPBarFilledWidth: number,
+    HPBarWrapperWidth: number,
+    HPBarText: string,
+    HPBarTextX: number,
+    deadAssetImage: characterType,
+
+    HoveredCharacterConditions?: ConditionDrawingData[],
+    currentlyHoverAssetID?: string
     
 }
 
 export type rightClickMenuType = {label:string, event: Function}[]
 
+ type shapesDrawnByUser = {
+    userName: string,
+    shapes: DrawingData[]
+}
+
+type Rectangle = {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+}
 
 export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: HTMLCanvasElement, presets:mapPresets, externalFunction: Function){
     const returned : mapType = {
@@ -185,19 +232,27 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         // contextMenuTextColorHover: '#f00',
 
         contextMenuBorderColor: '#372e24',
-        drawingModeX: 0,
-        drawingModeY: 0,
-        drawingModeSize: 0,
-        drawingModeDefaultSize: 20,
-        drawingModePreviewStyle: 'rgba(255, 0,0,1)',
-        drawingModeSizeIncrease: 1,
-        drawingModeMaxSize: 100,
+        drawingModeMaxSize: 1000,
         drawingModeMinSize: 10,
-        drawinModeAngle: 0,
-        drawingModeAngleRadians: 0,
-        drawingModeAngleIncrease: 1,
         drawingModeMaxAngle: 359,
-        drawingModeMinAngle: 0        
+        drawingModeMinAngle: 0,        
+        drawnShapes: [],
+        editingDrawing: getDefaultDrawing(),
+        lastPointOfMouseDown: {x: 0, y: 0},
+        lastMouseDownTime: 0,
+
+        HPBarX: 0,
+        HPBarY: 0,
+        HPBarFilledWidth: 0,
+        HPBarWrapperWidth: 0,
+        HPBarText: '',
+        HPBarTextX: 0,
+        deadAssetImage: {x: 0, y: 0, name: 'dead', graphicUrl: 'https://s14.gifyu.com/images/bN2h7.webp', id: '2137694201213'},
+
+        drawingResizng: {ready: false, initialPoint: {x:0, y:0}, initialDistance:0, initialSize: 0, currentPoint:{x:0,y:0}},
+        drawingRotating: {ready: false, referencePoint: {x:0, y:0}, previousPoint: {x:0, y:0}, initialAngle: 0},
+        drawingMoving: {ready: false},
+
     }
 
     return returned;
@@ -257,7 +312,30 @@ export type mapPresets = {
     PING_INCREASE_RADIUS: number,
     PING_MAX_NUMBER_OF_CYCLES: number,
     PING_FILL_STYLE: string,
-    PING_MINI_MAP_COLOR: string
+    PING_MINI_MAP_COLOR: string,
+    HP_BAR_Y: number,
+    HP_BAR_HEIGHT: number,
+    HP_BAR_BORDER_COLOR: string,
+    HP_BAR_COLOR: string,
+    HP_BAR_EMPTY_COLOR: string,
+    HP_BAR_TEXT_COLOR: string,
+    HP_BAR_FONT: string
+    HP_BAR_BORDER_THICKNESS: number,
+    HP_BAR_TOP_MARGIN: number,
+    HP_BAR_TEXT_OFFSET_Y: number,
+    HP_BAR_WIDTH_OVERFLOW: number,
+    HP_BAR_TEXT_ALIGN: 'start' | 'end' | 'center' | 'left' | 'right',
+    COORDINATES_BOX_X: number,
+    COORDINATES_BOX_Y: number,
+    COORDINATES_TEXT_FONT: string,
+    MOUSE_CLICK_TIME_FILTER: number,
+    SIZE_INCREASE_FILTER: number,
+    DRAWING_MAX_SIZE: number,
+    DRAWING_MIN_SIZE: number,
+    PREVENT_SELECTING_CHARACTERS_KEY: string,
+    MAX_CONDITIONS_PER_ROW: number,
+    CONDITION_FONT: string,
+    CONDITION_ROW_MAX_WIDTH: number,
 }
 
 export function getMainMapPresets(){
@@ -315,8 +393,44 @@ export function getMainMapPresets(){
         PING_INCREASE_RADIUS: 10,
         PING_MAX_NUMBER_OF_CYCLES: 5,
         PING_FILL_STYLE: 'rgba(0,0,0,0.4)',
-        PING_MINI_MAP_COLOR: 'white'
+        PING_MINI_MAP_COLOR: 'white',
+        HP_BAR_Y: 0,
+        HP_BAR_HEIGHT: 10,
+        HP_BAR_BORDER_COLOR: 'black',
+        HP_BAR_COLOR: '#771a0e',
+        HP_BAR_EMPTY_COLOR: 'gray',
+        HP_BAR_TEXT_COLOR: 'white',
+        HP_BAR_FONT: '12px Laila',
+        HP_BAR_BORDER_THICKNESS: 3,
+        HP_BAR_TOP_MARGIN: 5,
+        HP_BAR_TEXT_OFFSET_Y: 8,
+        HP_BAR_WIDTH_OVERFLOW: 10,
+        HP_BAR_TEXT_ALIGN: 'center',
+        COORDINATES_BOX_X: 10,
+        COORDINATES_BOX_Y: 20,
+        COORDINATES_TEXT_FONT: '20px Laila',
+        MOUSE_CLICK_TIME_FILTER: 200,
+        SIZE_INCREASE_FILTER: 20,
+        DRAWING_MAX_SIZE: 600,
+        DRAWING_MIN_SIZE: 20,
+        PREVENT_SELECTING_CHARACTERS_KEY: 'Shift',
+        MAX_CONDITIONS_PER_ROW: 3,
+        CONDITION_FONT: '12px Laila',
+        CONDITION_ROW_MAX_WIDTH: 200
     }
     
     return returned;
+}
+
+export function getDefaultDrawing(): DrawingData{
+    return{
+        shapeType: '',
+        color: '',
+        size: 0,
+        feets: '0',
+        meters: '0',
+        angle: 0,
+        x: 0,
+        y: 0
+    }
 }

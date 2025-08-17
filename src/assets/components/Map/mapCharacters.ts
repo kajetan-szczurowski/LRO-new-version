@@ -114,6 +114,7 @@ function getMoveIncrease(asset:characterType, move: moveType, step: number){
 
 }
 
+
 type moveType = {
     direction: "I" | "II" | "III" | "IV" | "vertical" | "horizontal" | undefined,
     values : {x: number, y:number}

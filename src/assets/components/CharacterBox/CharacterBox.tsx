@@ -1,6 +1,7 @@
 import { useState,  useRef } from 'react'
 import About from './About';
 import Rolls from './Rolls';
+import Drawings from './Drawings';
 import MapGraphics from '../GameMasterBox/MapGraphics';
 import MapAuthorizations from '../GameMasterBox/MapAuthorizations';
 import { Signal, useSignalEffect, signal} from "@preact/signals-react";
@@ -15,6 +16,7 @@ import { triggerControlsWindow } from './ControlsView';
 import { usersDataState } from '../../states/GlobalState';
 import { useSocket } from '../../providers/SocketProvider';
 import EditAttributeDialog from './Editables/EditAttributeDialog';
+import Assets from './AssetsAndConditions/Assets';
 
 const chosenCharacterStorageKey = 'lets-roll-one-chosenID';
 const charactersMapStorageKey = 'lets-roll-one-charactersMap';
@@ -97,6 +99,8 @@ export default function CharacterBox() {
               <NavigationButton state = 'about'/>
               <NavigationButton state = 'rolls'/>
               <NavigationButton state = 'combat'/>
+              <NavigationButton state = 'drawings'/>
+              {userIsGM && <NavigationButton state = 'assets'/>}
               {userIsGM && <NavigationButton state = 'MapGraphics' />}
               {userIsGM && <NavigationButton state = 'mapAuthorizations' />}
         </div>
@@ -106,8 +110,10 @@ export default function CharacterBox() {
             {openWindow === 'rolls' && <Rolls/>}
             {openWindow === 'about' && <About/>}
             {openWindow === 'combat' && <Combat/>}
+            {openWindow === 'drawings' && <Drawings/>}
             {openWindow === 'mapAuthorizations' && <MapAuthorizations/>}
             {openWindow === 'MapGraphics' && <MapGraphics/>}
+            {openWindow === 'assets' && <Assets/>}
 
 
         </div>

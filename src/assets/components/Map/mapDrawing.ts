@@ -1,56 +1,152 @@
-import { mapType, characterType } from "./mapTypes";
+import { mapType, characterType, ConditionDrawingData } from "./mapTypes";
+import { DrawingData } from "./mapDrawingMode";
+import { degreesToRadians } from "./mapMath";
+import { showCoordinates, hideConditions } from "../CharacterBox/Settings";
+
 
 export function drawAll(map: mapType){
     drawMap(map);
     map.assets.forEach(ass => {if (ass.isVisible) drawAsset(ass, map)});
     drawActiveAsset(map);
-    drawMeasure(map);
     drawMapBorderGraphic(map);
+    drawUserDrawings(map);
+    drawDrawingDuringEdit(map);
+    drawMeasure(map);
     drawMiniMap(map);
-    drawDrawingModePreview(map);
+    drawCoordinates(map);
     drawPing(map);
+    drawHP(map);
+    drawConditions(map);
     drawContextMenu(map);
     map.frameDrawing = false;
 
 }
 
-function drawDrawingModePreview(map: mapType){
-    if (!map.drawingModeShape) return;
-    switch (map.drawingModeShape){
+function drawDrawingDuringEdit(map: mapType){
+    if (!map.editingDrawing.userName || !map.drawingSelectionRectangle) return;
+    const dontShowRectangle = map.editingDrawing.shapeType === 'line' && map.editingDrawingOperation === 'rotating';
+    if (!dontShowRectangle) drawSelectedDrawingRectangle(map);
+    if (map.editingDrawingOperation === '') return;
+    drawUsersShape(map, map.editingDrawing.shapeType, false, map.editingDrawing, true);
+
+}
+
+function drawSelectedDrawingRectangle(map: mapType){
+    if (!map.drawingSelectionRectangle) return;
+    map.canvas.setLineDash([5, 5]);
+    const {x, y, width, height} = {...map.drawingSelectionRectangle};
+    drawRectangle({canvasContext: map.canvas, x: x - map.x, y: y - map.y, width: width, height: height, strokeStyle: 'red', lineWidth: 1});
+    map.canvas.setLineDash([]);
+}
+
+function drawUserDrawings(map: mapType){
+    map.drawnShapes.forEach(userShapes => userShapes.shapes.forEach(shape => drawUsersShape(map, shape.shapeType, false, shape)));
+}
+
+// function drawDrawingModePreview(map: mapType){
+//     if (!map.drawingModeShape) return;
+//     drawUsersShape(map, map.drawingModeShape);
+//     writeMeasureText(map);
+// }
+
+
+function drawUsersShape(map: mapType, shapeName: string, preview = true, customShape: DrawingData | null = null, shapeDuringEditing: boolean = false){
+    //preview - obsolete, migth clean up later
+    if (!shapeDuringEditing && map.editingDrawingOperation === 'resizing' && customShape){
+        if (map.editingDrawing.id === customShape.id) return;
+    }
+
+    if (!preview && !customShape) return;
+    switch (shapeName){
         case 'circle':
-            drawPreviewCircle(map);
+            // if (preview) drawPreviewCircle(map);
+             if (customShape) drawCircle({canvasContext: map.canvas, x: customShape.x - map.x, y: customShape.y - map.y,
+                radius: customShape.size, fillStyle: customShape.color});
             break;
         
         case 'cone':
-            drawPreviewCone(map);
+            // if (preview) drawPreviewCone(map);
+             if (customShape) drawCone({canvasContext: map.canvas, x: customShape.x - map.x , y: customShape.y - map.y,
+                radius: customShape.size, fillStyle: customShape.color, radians: degreesToRadians(customShape.angle)});
             break;
 
         case 'line':
-            drawPreviewLine(map);
+            // if (preview) drawPreviewLine(map);
+             if (customShape) drawUsersLine(map, customShape);
             break;
     }
-    writeMeasureText(map);
 }
 
-function drawPreviewCircle(map: mapType){
-    drawCircle({canvasContext: map.canvas, x: map.drawingModeX, y: map.drawingModeY, 
-        radius: map.drawingModeSize, fillStyle: map.drawingModePreviewStyle});
+function drawCoordinates(map: mapType){
+    if (!showCoordinates.value) return;
+    writeText({canvasContext: map.canvas, x:map.presets.COORDINATES_BOX_X, y: map.presets.COORDINATES_BOX_Y, font: map.presets.COORDINATES_TEXT_FONT, 
+        fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, text: `x: ${Math.round(map.absoluteMouseX)} y: ${Math.round(map.absoluteMouseY)}`, 
+        strokeStyle: map.presets.DISTANCE_FONT_STROKE_STYLE})
 }
 
-function drawPreviewCone(map: mapType){
-    drawCone({canvasContext: map.canvas, x: map.drawingModeX, y: map.drawingModeY, radius: map.drawingModeSize, fillStyle: map.drawingModePreviewStyle,
-        radians: map.drawingModeAngleRadians});
+function drawOneCondition(map:mapType, condition: ConditionDrawingData){
+    drawRectangle({canvasContext: map.canvas, x: condition.x -5, y: condition.y - 5, width: condition.width, height: condition.height, fillStyle: '#493f33'});
+    drawRectangle({canvasContext: map.canvas, x: condition.x -5, y: condition.y - 5, width: condition.width, height: condition.height, strokeStyle: 'black', lineWidth: 2});
+    writeText({canvasContext: map.canvas, x: condition.x, y: condition.y + 10, font: map.presets.CONDITION_FONT, textAlign: 'left', text: condition.label, fillStyle: map.presets.HP_BAR_TEXT_COLOR});
+    writeText({canvasContext: map.canvas, x: condition.forceX, y: condition.y + 10, font: map.presets.CONDITION_FONT, textAlign: 'left', text: String(condition.force), fillStyle: map.presets.HP_BAR_TEXT_COLOR});
 }
 
-function drawPreviewLine(map: mapType){
-    if (!map.drawingModeLinePoint1 || !map.drawingModeLinePoint2) return;
-    const x1 = map.drawingModeLinePoint1.x;
-    const y1 = map.drawingModeLinePoint1.y;
-    const x2 = map.drawingModeLinePoint2.x;
-    const y2 = map.drawingModeLinePoint2.y;
+function drawConditions(map: mapType){
+    if (hideConditions.value) return;
+    if (!map.HoveredCharacterConditions || map.HoveredCharacterConditions.length === 0) return;
+    map.HoveredCharacterConditions.forEach(condition => {
+        drawOneCondition(map, condition);
+    });
+}
+
+function drawHP(map: mapType){
+    if (!map.maxAssetHP) return;
+    if (map.currentAssetHP === undefined || map.currentAssetHP === null) return;
+    if (map.measuring) return;
+    const borderX = map.HPBarX - map.presets.HP_BAR_BORDER_THICKNESS / 2;
+    const borderWidth = map.HPBarWrapperWidth + map.presets.HP_BAR_BORDER_THICKNESS;
+    const borderY = map.HPBarY - map.presets.HP_BAR_BORDER_THICKNESS / 2;
+    const borderHeight = map.presets.HP_BAR_HEIGHT + map.presets.HP_BAR_BORDER_THICKNESS;
+    //TODO: Styling
+    drawRectangle({canvasContext: map.canvas, x: map.HPBarX, y: map.HPBarY, width: map.HPBarWrapperWidth, height: map.presets.HP_BAR_HEIGHT, fillStyle: map.presets.HP_BAR_EMPTY_COLOR});
+    drawRectangle({canvasContext: map.canvas, x: borderX, y: borderY, width: borderWidth, height: borderHeight, strokeStyle: map.presets.HP_BAR_BORDER_COLOR, lineWidth: map.presets.HP_BAR_BORDER_THICKNESS});
+    drawRectangle({canvasContext: map.canvas, x: map.HPBarX, y: map.HPBarY, width: map.HPBarFilledWidth, height: map.presets.HP_BAR_HEIGHT, fillStyle: map.presets.HP_BAR_COLOR   });
+    if (map.HPBarText){
+        const textY = map.HPBarY + map.presets.HP_BAR_TEXT_OFFSET_Y;
+        writeText({canvasContext: map.canvas, x: map.HPBarTextX, y: textY, font: map.presets.HP_BAR_FONT, fillStyle: map.presets.HP_BAR_TEXT_COLOR, text: map.HPBarText, textAlign: map.presets.HP_BAR_TEXT_ALIGN });
+    }
+    // writeText({canvasContext: map.canvas, x: map.visibleWidth / 2 - 50, y: 20,  font: map.contexMenuFontStyle ?? '', text: `${map.currentAssetHP}/${map.maxAssetHP}`, fillStyle: map.contextMenuTextColorHover});
+}
+
+function drawUsersLine(map: mapType, lineData: DrawingData){
+    if (!lineData.linePoint1 || !lineData.linePoint2) return;
+    const x1 = lineData.linePoint1.x - map.x;
+    const y1 = lineData.linePoint1.y - map.y;
+    const x2 = lineData.linePoint2.x - map.x;
+    const y2 = lineData.linePoint2.y - map.y;
     drawLine({canvasContext: map.canvas, x1: x1, y1: y1, x2: x2, y2: y2, lineWidth: 6, 
-            strokeStyle: map.drawingModePreviewStyle});
+        strokeStyle: lineData.color});
 }
+
+// function drawPreviewCircle(map: mapType){
+//     drawCircle({canvasContext: map.canvas, x: map.editingDrawing.x, y: map.editingDrawing.y, 
+//         radius: map.editingDrawing.size, fillStyle: '#000'});
+// }
+
+// function drawPreviewCone(map: mapType){
+//     drawCone({canvasContext: map.canvas, x: map.editingDrawing.x, y: map.editingDrawing.y, radius: map.editingDrawing.size, fillStyle: '#000',
+//         radians: degreesToRadians(map.editingDrawing.angle)});
+// }
+
+// function drawPreviewLine(map: mapType){
+//     if (!map.editingDrawing.linePoint1 || !map.editingDrawing.linePoint2) return;
+//     const x1 = map.editingDrawing.linePoint1.x;
+//     const y1 = map.editingDrawing.linePoint1.y;
+//     const x2 = map.editingDrawing.linePoint2.x;
+//     const y2 = map.editingDrawing.linePoint2.y;
+//     drawLine({canvasContext: map.canvas, x1: x1, y1: y1, x2: x2, y2: y2, lineWidth: 6, 
+//             strokeStyle: '#000'});
+// }
 
 function drawContextMenu(map: mapType){
     if (!map.isContextMenuOpened) return;
@@ -86,12 +182,34 @@ function drawAsset(asset: characterType, map: mapType){
     if (!asset.img || ! asset.sourceWidth || !asset.sourceHeight || !asset.size) return;
     const onCanvasX = asset.x - map.x;
     const onCanvasY = asset.y - map.y;
-    map.canvas.drawImage(asset.img, 0, 0, asset.sourceWidth, asset.sourceHeight, onCanvasX, onCanvasY, asset.size, asset.size);
+    let imageSource = asset.img;
+    let sourceWidth = asset.sourceWidth;
+    let sourceHeight = asset.sourceHeight;
+    if (asset.maxHP) 
+        if (asset.currentHP === 0 && map.deadAssetImage.img){
+            imageSource = map.deadAssetImage.img;
+            sourceWidth = map.deadAssetImage.img.width;
+            sourceHeight = map.deadAssetImage.img.height;
+        } 
+    map.canvas.drawImage(imageSource, 0, 0, sourceWidth, sourceHeight, onCanvasX, onCanvasY, asset.size, asset.size);
     if (asset.active)
         drawRectangle({canvasContext: map.canvas, x:onCanvasX, y:onCanvasY, width:asset.size, 
                        height:asset.size, strokeStyle: map.presets.ASSET_ACTIVE_STROKE_STYLE, lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH});
 
     asset.toBeRedrawn = false;
+
+    //<Miron's aura, please make this proper later>
+    if (asset.name.toLowerCase() !== 'miron') return;
+    const MIRON_AURA_KEY = 'LRO-application-Miron-aura';
+    const mironAuraRadius = Number(sessionStorage.getItem(MIRON_AURA_KEY)) ?? 0;
+    if (!mironAuraRadius) return;
+    const circleX = onCanvasX + asset.size / 2;
+    const circleY = onCanvasY + asset.size / 2;
+    const AURA_COLOR_KEY = 'LRO-application-aura-color';
+    const auraBaseColor = localStorage.getItem(AURA_COLOR_KEY) ?? '#000000';
+    const auraFillColor = `${auraBaseColor}50`;
+    drawCircle({canvasContext: map.canvas, x: circleX, y: circleY, radius: mironAuraRadius * 10, fillStyle: auraFillColor});
+    //</Miron's aura>
 }
 
 function drawActiveAsset(map: mapType){

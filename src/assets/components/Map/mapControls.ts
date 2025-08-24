@@ -1,4 +1,4 @@
-import { getDefaultDrawing, mapType } from "./mapTypes"
+import { CharacterCondition, getDefaultDrawing, mapType } from "./mapTypes"
 import { isMouseOnCharacter } from "./mapCharacters";
 import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
@@ -530,39 +530,53 @@ function handleHP(map: mapType){
 
                 const conditions = map.assets[i].conditions;
                 if (!conditions) return;
-                map.canvas.font = map.presets.CONDITION_FONT;
-                let counter = 0;
-                const assetX = map.assets[i].x + ((map.assets[i].size ?? 50) / 2);
-                const startX = assetX - map.presets.CONDITION_ROW_MAX_WIDTH / 2;
-                let currentX = startX;
-                let currentY = map.assets[i].y + (map.assets[i].size ?? 50) + 30;
-                let newWidth = 0;
-                let currentXForce = 0;
-                let widthDelta = 0;
-                let startIndex = 0;
+                if (!conditions.length) return;
+
                 map.HoveredCharacterConditions = [];
-                conditions?.forEach(cond => {
-                    if (map.HoveredCharacterConditions === undefined) return;
-                    newWidth = map.canvas.measureText(`${cond.force} ${cond.label} `).width + 10;
-                    currentXForce = currentX + map.canvas.measureText(`${cond.label}`).width + 5; 
-                    counter++;
-                    map.HoveredCharacterConditions?.push({x: currentX - map.x, y: currentY - map.y, width: newWidth, height: 25, forceX: currentXForce - map.x, ...cond});
-                    currentX += newWidth + 20;
-                    if (counter >= map.presets.MAX_CONDITIONS_PER_ROW){
-                        widthDelta = currentX - assetX - assetX + startX;
-                        currentX = startX;
-                        currentY += 30;
-                        counter = 0;
-                        if (widthDelta !==0){
-                            for (let j = startIndex; j < startIndex + map.presets.MAX_CONDITIONS_PER_ROW; j++){
-                                map.HoveredCharacterConditions[j].x -=  (widthDelta / map.presets.MAX_CONDITIONS_PER_ROW);
-                                map.HoveredCharacterConditions[j].forceX -=  (widthDelta / map.presets.MAX_CONDITIONS_PER_ROW);
-                            }
-                        }
+                const startingX = map.assets[i].x + (map.assets[i].size ?? map.presets.ASSET_SIZE) / 2;
+                const startingY = map.assets[i].y + (map.assets[i].size ?? map.presets.ASSET_SIZE)  + map.presets.CONDITIONS_MARGIN_TOP;
+                let currentValueX = startingX;
+                const numberOfRows = Math.ceil(conditions.length / map.presets.MAX_CONDITIONS_PER_ROW);
+                const additionalX = map.presets.DISTANCE_BEFORE_CONDITION_FORCE + map.presets.CONDITION_BORDER_WIDTH + map.presets.CONDITION_PADDING;
+                const widthAddition = map.presets.CONDITION_BORDER_WIDTH + map.presets.CONDITION_PADDING;
+                let maxWidth = 0;
+                let currentIndex = 0;
+                let currentCondition: CharacterCondition;
+                let currentWidth = 0;
+                let baseWidth = 0;
+                let forceX = 0;
+                let conditionY = 0;
+                let widthAppendixForForce = 0;
+                const heightAppendix = map.presets.CONDITION_BORDER_WIDTH *2 + map.presets.CONDITION_PADDING * 2;
+                map.canvas.font = map.presets.CONDITION_FONT;
+                const conditionTextHeight = map.canvas.measureText('M').width;
+                const conditionHeight = conditionTextHeight + heightAppendix;
+
+                for (let index = 0; index < map.presets.MAX_CONDITIONS_PER_ROW; index++){
+                    maxWidth = 0;
+
+                    for (let row = 0; row < numberOfRows; row++){
+                        currentIndex = index + (row * map.presets.MAX_CONDITIONS_PER_ROW);
+                        if (currentIndex >= conditions.length) break;
+                        currentCondition = conditions[currentIndex];
+                        baseWidth = map.canvas.measureText(currentCondition.label).width + widthAddition;
+                        widthAppendixForForce = currentCondition.force? map.canvas.measureText(`${currentCondition.force}`).width + map.presets.DISTANCE_BEFORE_CONDITION_FORCE : 0;
+                        forceX = currentCondition.force? currentValueX + baseWidth + map.presets.DISTANCE_BEFORE_CONDITION_FORCE : 0;
+                        currentWidth = baseWidth + widthAppendixForForce + widthAddition * 2;
+                        conditionY =  startingY + (row * (conditionHeight + map.presets.CONDITION_GRID_GAP));
+                        map.HoveredCharacterConditions.push({x: currentValueX, forceX: forceX, y:conditionY, height: conditionHeight, width: currentWidth, ...currentCondition});
+                        if (currentWidth > maxWidth) maxWidth = currentWidth;
                     }
-                });
+
+                    currentValueX += maxWidth + additionalX + map.presets.CONDITION_GRID_GAP;
+
+                }
+
+                const offset = (currentValueX - startingX) / 2;
+                map.HoveredCharacterConditions.forEach(condition => { condition.x -= offset; condition.forceX -= offset });
 
                 return;
+        
             }
         map.HoveredCharacterConditions = [];
         map.currentlyHoverAssetID = '';

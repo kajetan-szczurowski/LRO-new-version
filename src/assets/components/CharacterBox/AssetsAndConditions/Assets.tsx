@@ -59,8 +59,8 @@ export default function Assets() {
             })}
         </ul>
             <NewConditionDialog/>
+            <button onClick = {handleOrdersSubmit}>Submit conditions</button>
             <ConditionsCart conditions = {assetsBoxConditionCart.value} handleClickCallback = {() => {}}/>
-            <button onClick = {handleOrdersSubmit}>Submit</button>
         </>
     )
 
@@ -123,6 +123,8 @@ export default function Assets() {
         if (!newNameRef.current) return;
         socket.emit('set-asset-name', {userID: userID, assetID: assetID, newName: newNameRef.current.value});
     }
+
+
 
 }
 

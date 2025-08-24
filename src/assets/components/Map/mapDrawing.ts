@@ -1,4 +1,4 @@
-import { mapType, characterType, ConditionDrawingData } from "./mapTypes";
+import { mapType, characterType, ConditionDrawingData, assetType } from "./mapTypes";
 import { DrawingData } from "./mapDrawingMode";
 import { degreesToRadians } from "./mapMath";
 import { showCoordinates, hideConditions } from "../CharacterBox/Settings";
@@ -85,10 +85,12 @@ function drawCoordinates(map: mapType){
 }
 
 function drawOneCondition(map:mapType, condition: ConditionDrawingData){
-    drawRectangle({canvasContext: map.canvas, x: condition.x -5, y: condition.y - 5, width: condition.width, height: condition.height, fillStyle: '#493f33'});
-    drawRectangle({canvasContext: map.canvas, x: condition.x -5, y: condition.y - 5, width: condition.width, height: condition.height, strokeStyle: 'black', lineWidth: 2});
-    writeText({canvasContext: map.canvas, x: condition.x, y: condition.y + 10, font: map.presets.CONDITION_FONT, textAlign: 'left', text: condition.label, fillStyle: map.presets.HP_BAR_TEXT_COLOR});
-    writeText({canvasContext: map.canvas, x: condition.forceX, y: condition.y + 10, font: map.presets.CONDITION_FONT, textAlign: 'left', text: String(condition.force), fillStyle: map.presets.HP_BAR_TEXT_COLOR});
+    const rectanglePoint = condition.x - map.presets.CONDITION_PADDING;
+    const borderPoint = rectanglePoint - map.presets.CONDITION_BORDER_WIDTH;
+    drawRectangle({canvasContext: map.canvas, x: borderPoint , y: condition.y - map.presets.CONDITION_PADDING, width: condition.width, height: condition.height, fillStyle: '#493f33'});
+    drawRectangle({canvasContext: map.canvas, x: borderPoint, y: condition.y - map.presets.CONDITION_BORDER_WIDTH, width: condition.width, height: condition.height, strokeStyle: 'black', lineWidth: map.presets.CONDITION_BORDER_WIDTH});
+    writeText({canvasContext: map.canvas, x: condition.x, y: condition.y + 15, font: map.presets.CONDITION_FONT, textAlign: 'left', text: condition.label, fillStyle: map.presets.HP_BAR_TEXT_COLOR});
+    writeText({canvasContext: map.canvas, x: condition.forceX, y: condition.y + 15, font: map.presets.CONDITION_FONT, textAlign: 'left', text: String(condition.force), fillStyle: map.presets.HP_BAR_TEXT_COLOR});
 }
 
 function drawConditions(map: mapType){
@@ -211,6 +213,8 @@ function drawAsset(asset: characterType, map: mapType){
     drawCircle({canvasContext: map.canvas, x: circleX, y: circleY, radius: mironAuraRadius * 10, fillStyle: auraFillColor});
     //</Miron's aura>
 }
+
+
 
 function drawActiveAsset(map: mapType){
     if (!map.mouseOnMap || !map.activeSide) return;

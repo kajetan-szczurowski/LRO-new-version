@@ -161,7 +161,8 @@ export type mapType = assetType & {
     deadAssetImage: characterType,
 
     HoveredCharacterConditions?: ConditionDrawingData[],
-    currentlyHoverAssetID?: string
+    currentlyHoverAssetID?: string,
+
     
 }
 
@@ -335,7 +336,11 @@ export type mapPresets = {
     PREVENT_SELECTING_CHARACTERS_KEY: string,
     MAX_CONDITIONS_PER_ROW: number,
     CONDITION_FONT: string,
-    CONDITION_ROW_MAX_WIDTH: number,
+    CONDITION_GRID_GAP: number,
+    CONDITION_PADDING: number,
+    CONDITION_BORDER_WIDTH: number,
+    DISTANCE_BEFORE_CONDITION_FORCE: number,
+    CONDITIONS_MARGIN_TOP: number,
 }
 
 export function getMainMapPresets(){
@@ -416,7 +421,11 @@ export function getMainMapPresets(){
         PREVENT_SELECTING_CHARACTERS_KEY: 'Shift',
         MAX_CONDITIONS_PER_ROW: 3,
         CONDITION_FONT: '12px Laila',
-        CONDITION_ROW_MAX_WIDTH: 200
+        CONDITION_GRID_GAP: 10,
+        CONDITION_PADDING: 5,
+        CONDITION_BORDER_WIDTH: 4,
+        DISTANCE_BEFORE_CONDITION_FORCE: 5,
+        CONDITIONS_MARGIN_TOP: 50,
     }
     
     return returned;

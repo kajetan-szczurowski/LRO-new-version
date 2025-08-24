@@ -10,6 +10,8 @@ export default function MapGraphics() {
     const socket = useSocket();
     const [maps, setMaps] = useState<graphicAssetType[]>(() => {socket.emit('get-maps', userID); return []});
     const [assets, setAssets] = useState<graphicAssetType[]>(() => {socket.emit('get-assets', userID); return []});
+    const [showMap, setShowMaps] = useState(false);
+    const [showAssets, setShowAssets] = useState(false);
     const sizeRef = useRef<HTMLInputElement>(null);
     const newAssetNameRef = useRef<HTMLInputElement>(null);
     const newAssetURLRef = useRef<HTMLInputElement>(null);
@@ -30,8 +32,11 @@ export default function MapGraphics() {
     return(
       <>
         <section id = 'admin-box'>
-            <MapsComponent/>
-            <AssetsComponet/>
+            <Header label = 'Maps' callback = {() => setShowMaps(prev => !prev)} />
+            <div className = {showMap? '' : 'display-none'}><MapsComponent/></div>
+
+            <Header label = 'Assets' callback = {() => setShowAssets(prev => !prev)} />
+            <div className = {showAssets? '' : 'display-none'}><AssetsComponet/></div>
             
             <input ref = {sizeRef}></input>
             <button onClick = {resetSize}>Reset size input</button>
@@ -45,6 +50,15 @@ export default function MapGraphics() {
       </>
 
     )
+
+    function Header({label, callback} : {label: string, callback: Function}){
+        return(
+            <h2>
+                {label} <span onClick = {() => callback()} >{'Show/Hide'} </span>
+            </h2>
+        )
+
+    }
 
     function MapsList({filter}: {filter: string}){
         const filteredMaps = maps.filter(m => m.label.toLowerCase().includes(filter.toLowerCase()));

@@ -56,6 +56,8 @@ function performMapLogic(map: mapType, charactersSource: characterType[]){
 }
 
 
+
+
 function checkForCharacters(map: mapType, charactersSource: characterType[]){
     map.assets = [...charactersSource];
 }

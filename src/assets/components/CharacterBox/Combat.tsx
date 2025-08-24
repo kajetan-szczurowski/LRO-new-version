@@ -21,6 +21,7 @@ export default function Combat() {
     return(
         <>
             {userIsGM && <NPC_HP_Form />}
+            {userIsGM && <button onClick = {() => socket.emit('synchronize-playable-hps')}>Synchronize Player's HP on map</button>}
             <HP />
             {userIsGM && <InitiativeForm />}
             {userIsGM && <button onClick = {()=> socket.emit('initiative-command', {userID: userID, command: 'previous'})} >Ini prev</button>}

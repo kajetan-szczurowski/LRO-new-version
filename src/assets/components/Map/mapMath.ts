@@ -29,3 +29,12 @@ export function angleBetweenTwoPoints(cornerX: number, cornerY: number, x1: numb
     const cosines = numerator / denominator;
     return Math.acos(cosines);
 } 
+
+export function cartesianQuadrant(referenceX: number, referenceY: number, x1:number, y1:number){
+    if (x1 > referenceX  && y1 > referenceY) return "I";
+    if (x1 < referenceX  && y1 > referenceY) return "II";
+    if (x1 < referenceX  && y1 < referenceY) return "III";
+    if (x1 > referenceX  && y1 < referenceY) return "IV";
+    if (x1 == referenceX) return "vertical";
+    if (x1 == referenceX) return "horizontal";
+}

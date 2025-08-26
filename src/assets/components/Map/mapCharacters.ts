@@ -51,7 +51,7 @@ function checkForMoving(asset: characterType){
 }
 
 function handleMove(asset: characterType, map:mapType){
-    const move: moveType = {direction: undefined, values: {x:0, y:0}}
+    const move: moveType = {direction: undefined, values: {x:0, y:0}};
     move.direction = getMoveDirection(asset);
     move.values = getMoveIncrease(asset, move, map.presets.ASSET_STEP_SIZE);
     asset.x = move.values.x;
@@ -61,12 +61,13 @@ function handleMove(asset: characterType, map:mapType){
 
 function getMoveDirection(asset:characterType){
     if (!asset.aimedX || !asset.aimedY) return;
-    if (asset.aimedX > asset.x  && asset.aimedY > asset.y) return "I";
-    if (asset.aimedX < asset.x  && asset.aimedY > asset.y) return "II";
-    if (asset.aimedX < asset.x  && asset.aimedY < asset.y) return "III";
-    if (asset.aimedX > asset.x  && asset.aimedY < asset.y) return "IV";
-    if (asset.aimedX == asset.x) return "vertical";
-    if (asset.aimedY == asset.y) return "horizontal";
+    return geometry.cartesianQuadrant(asset.x, asset.y, asset.aimedX, asset.aimedY);
+    // if (asset.aimedX > asset.x  && asset.aimedY > asset.y) return "I";
+    // if (asset.aimedX < asset.x  && asset.aimedY > asset.y) return "II";
+    // if (asset.aimedX < asset.x  && asset.aimedY < asset.y) return "III";
+    // if (asset.aimedX > asset.x  && asset.aimedY < asset.y) return "IV";
+    // if (asset.aimedX == asset.x) return "vertical";
+    // if (asset.aimedY == asset.y) return "horizontal";
 }
 
 function getMoveIncrease(asset:characterType, move: moveType, step: number){

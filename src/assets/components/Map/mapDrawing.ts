@@ -1,4 +1,4 @@
-import { mapType, characterType, ConditionDrawingData, assetType } from "./mapTypes";
+import { mapType, characterType, ConditionDrawingData } from "./mapTypes";
 import { DrawingData } from "./mapDrawingMode";
 import { degreesToRadians } from "./mapMath";
 import { showCoordinates, hideConditions } from "../CharacterBox/Settings";

@@ -4,7 +4,9 @@ import { useSocket } from "../../providers/SocketProvider";
 import { mapType } from "./mapTypes";
 import * as geometry from "./mapMath";
 import { getDrawingData } from "./mapDrawingMode";
+import { signal } from "@preact/signals-react";
 
+export const mapCharacters = signal<characterType[]>([]);
 
 
 const characters: characterType[] = [];
@@ -52,6 +54,7 @@ export default function Map() {
         characters.splice(0, characters.length + 1);
         if (args.length) args.forEach((a: any) => characters.push(a));
         if (!args.length) mapData.toBeRedrawn = true;
+        mapCharacters.value = characters;
         return;
       }
 

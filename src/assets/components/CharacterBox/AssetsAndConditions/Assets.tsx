@@ -10,6 +10,7 @@ import { ConditionInCart } from './ConditionTypes';
 import ConditionsCart from './ConditionsCart';
 import { CharacterCondition } from '../../Map/mapTypes';
 import AssetCondition from './AssetCondition';
+import { mapCharacters } from '../../Map/Map';
 
 export const assetsBoxConditionCart = signal<ConditionInCart[]>([]);
 
@@ -21,14 +22,14 @@ export default function Assets() {
     const userID = usersDataState.value.userID;
     const [assetsList, setAssetsList] = useState<characterType[]>(() => { socket.emit('give-me-assets-data', userID); return [] });
 
-    socket.on('assets-data', payload => setAssetsList(payload));
-    socket.on('map-assets', payload => setAssetsList(payload));
+    // socket.on('assets-data', payload => setAssetsList(payload));
+    // socket.on('map-assets', payload => setAssetsList(payload));
 
     return(
         <>
 
         <ul>
-            {assetsList.map(asset => {
+            {mapCharacters.value.map(asset => {
                 const label = `${asset.name} (${Math.round(asset.x)}, ${Math.round(asset.y)})`;
                 return(
                     <li key = {asset.id} className = ''>

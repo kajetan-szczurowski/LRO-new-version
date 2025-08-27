@@ -1,5 +1,5 @@
 import { getDefaultDrawing, mapType } from "./mapTypes"
-import { angleBetweenTwoPoints, degreesToRadians, euclideanDistance, feetsToMeters, radiansToDegrees } from "./mapMath";
+import { angleBetweenTwoPoints, cartesianQuadrant, degreesToRadians, euclideanDistance, feetsToMeters, radiansToDegrees } from "./mapMath";
 import { usersDataState } from "../../states/GlobalState";
 
 
@@ -83,7 +83,6 @@ export function isMouseOnDrawing(map: mapType, drawing: DrawingData){
 }
 
 function handleRotating(map: mapType){
-    //TODO: b key to map constant
     if (map.editingDrawingOperation !== "rotating") return;
     if (map.editingDrawing.angle === undefined || map.drawingRotating.initialAngle === undefined) return;
     if (!map.drawingSelectionRectangle) return;
@@ -91,18 +90,56 @@ function handleRotating(map: mapType){
     const startPoint = map.drawingRotating.previousPoint;
     const centerPoint = {x: map.editingDrawing.x, y: map.editingDrawing.y};
     const angleDifference = radiansToDegrees(angleBetweenTwoPoints(centerPoint.x, centerPoint.y, currentPoint.x, currentPoint.y, startPoint.x, startPoint.y));
-    const backwardsOrder = map.pressedKeys['b'] || map.pressedKeys['B'];
-    const angleModifier = backwardsOrder? -1 : 1;
+
+    const {x, y} = map.editingDrawing;
+    const direction = getRotatingDirection(x, y, startPoint.x, startPoint.y, currentPoint.x, currentPoint.y);
+    const angleModifier = direction;
+    map.drawingRotating.previousPoint = currentPoint;
+
+    if (!direction) return;
+
     map.editingDrawing.angle = (map.drawingRotating.initialAngle + angleDifference * angleModifier) % 360;
     if (map.editingDrawing.angle < 0) map.editingDrawing.angle = 360;
     map.drawingRotating.initialAngle = map.editingDrawing.angle;
-    map.drawingRotating.previousPoint = currentPoint;
     if (map.editingDrawing.shapeType === 'line'){
         handeEditingLine(map, {x: map.editingDrawing.x, y: map.editingDrawing.y})
     }
     setDrawingSelectionData(map);
 }
 
+function getRotatingDirection(referenceX: number, referenceY: number, x1: number, y1: number, x2: number, y2: number): 1 | -1 | 0{
+    const quarter1 = getRotatingQuadrant(referenceX, referenceY, x1, y1);
+    const quarter2 = getRotatingQuadrant(referenceX, referenceY, x2, y2);
+    // console.log('quarters:', quarter1, quarter2)
+    if (quarter1 === quarter2 && quarter1 === 1){
+        if (x2 < x1 || y2 < y1) return -1;
+        if (x2 > x1 || y2 > y1) return 1;
+        return 0;
+    }
+    if (quarter1 === quarter2 && quarter1 === 2){
+        if (x2 < x1 || y2 > y1) return -1;
+        if (x2 > x1 || y2 < y1) return 1;
+        return 0;
+    }
+    if (quarter1 === quarter2 && quarter1 === 3){
+        if (x2 < x1 || y2 < y1) return 1;
+        if (x2 > x1 || y2 > y1) return -1;
+        return 0;
+    }
+    if (quarter1 === quarter2 && quarter1 === 4){
+        if (x2 < x1 || y2 > y1) return 1;
+        if (x2 > x1 || y2 < y1) return -1;
+        return 0;
+    }
+
+    return 0;
+}
+
+function getRotatingQuadrant(referenceX: number, referenceY: number, currentX: number, currentY:number){
+    const quadrant = cartesianQuadrant(referenceX, referenceY, currentX, currentY);
+    const translator = {'IV': 1, 'III': 2, 'II': 3, 'I': 4, 'vertical': 12, 'horizontal': 23};
+    return translator[quadrant || 'I'];
+}
 
 
 function handleMoving(map: mapType){

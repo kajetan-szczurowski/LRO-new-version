@@ -1,6 +1,6 @@
 import { mapType, characterType, ConditionDrawingData } from "./mapTypes";
 import { DrawingData } from "./mapDrawingMode";
-import { degreesToRadians } from "./mapMath";
+import { degreesToRadians, euclideanDistance } from "./mapMath";
 import { showCoordinates, hideConditions } from "../CharacterBox/Settings";
 
 
@@ -28,7 +28,15 @@ function drawDrawingDuringEdit(map: mapType){
     if (!dontShowRectangle) drawSelectedDrawingRectangle(map);
     if (map.editingDrawingOperation === '') return;
     drawUsersShape(map, map.editingDrawing.shapeType, false, map.editingDrawing, true);
+    if (map.editingDrawingOperation === 'rotating') drawRotatingCircleHelper(map);
+}
 
+function drawRotatingCircleHelper(map:mapType){
+    const {x, y, size} = map.editingDrawing;
+    const {linePoint1, linePoint2} = map.editingDrawing;
+    const radius = map.editingDrawing.shapeType === 'line'? euclideanDistance(linePoint1?.x, linePoint1?.y, linePoint2?.x, linePoint2?.y) / 2 : size * Math.sqrt(2);
+    map.canvas.lineWidth = 1;
+    drawCircle({canvasContext: map.canvas, x: x, y: y, radius: radius, strokeStyle: 'aqua'});
 }
 
 function drawSelectedDrawingRectangle(map: mapType){

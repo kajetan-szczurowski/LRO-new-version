@@ -17,6 +17,7 @@ import { usersDataState } from '../../states/GlobalState';
 import { useSocket } from '../../providers/SocketProvider';
 import EditAttributeDialog from './Editables/EditAttributeDialog';
 import Assets from './AssetsAndConditions/Assets';
+import Initiative from './Initiative';
 
 const chosenCharacterStorageKey = 'lets-roll-one-chosenID';
 const charactersMapStorageKey = 'lets-roll-one-charactersMap';
@@ -101,6 +102,7 @@ export default function CharacterBox() {
               <NavigationButton state = 'combat'/>
               <NavigationButton state = 'drawings'/>
               {userIsGM && <NavigationButton state = 'assets'/>}
+              {userIsGM && <NavigationButton state = 'initiative' />}
               {userIsGM && <NavigationButton state = 'MapGraphics' />}
               {userIsGM && <NavigationButton state = 'mapAuthorizations' />}
         </div>
@@ -114,6 +116,8 @@ export default function CharacterBox() {
             {openWindow === 'mapAuthorizations' && <MapAuthorizations/>}
             {openWindow === 'MapGraphics' && <MapGraphics/>}
             {openWindow === 'assets' && <Assets/>}
+            {openWindow === 'initiative' && <Initiative/>}
+
 
 
         </div>

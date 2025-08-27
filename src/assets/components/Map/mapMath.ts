@@ -36,5 +36,5 @@ export function cartesianQuadrant(referenceX: number, referenceY: number, x1:num
     if (x1 < referenceX  && y1 < referenceY) return "III";
     if (x1 > referenceX  && y1 < referenceY) return "IV";
     if (x1 == referenceX) return "vertical";
-    if (x1 == referenceX) return "horizontal";
+    if (y1 == referenceY) return "horizontal";
 }

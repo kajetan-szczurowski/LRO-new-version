@@ -34,16 +34,13 @@ export function processMap(canvasId : string, presets:mapPresets, charactersArra
         mapData = getDefaultMap(canvas, canvasObject, presets, controllFunction);
         controls.canvasEventListeners(mapData);
         socket.on('map-control', (parameters) => {mapData.controllFunction(parameters.controlWord, parameters.args, mapData)});
-
+        setTimeout(() => socket.emit('initiative-for-map'), 2000);
     }
 
 }
 
 function performMapLogic(map: mapType, charactersSource: characterType[]){
-    if (map.currentGraphicUrl !== map.graphicUrl) loadImage(map);
-    if (map.presets.BORDER_GRAPHIC_URL && !map.borderImg) loadBorderImg(map)
-    if (!map.visibleWidth || map.resized) calculateCanvasSize(map);
-    if (!map.deadAssetImage.img) loadImage(map.deadAssetImage);
+    handleLoadingGraphics(map);
     controls.handleScrolling(map);
     checkForCharacters(map,charactersSource);
     characters.handleCharacters(map);
@@ -52,10 +49,21 @@ function performMapLogic(map: mapType, charactersSource: characterType[]){
     controls.handleMeasure(map);
     handlePing(map);
     rightClickMenu.handleRightClickMenu(map);
+    characters.handleInitativeAnimation(map);
     return map;
 }
 
 
+function handleLoadingGraphics(map: mapType){
+    if (map.currentGraphicUrl !== map.graphicUrl) loadImage(map);
+    if (map.presets.BORDER_GRAPHIC_URL && !map.borderImg) loadBorderImg(map)
+    if (!map.visibleWidth || map.resized) calculateCanvasSize(map);
+    if (!map.deadAssetImage.img) loadImage(map.deadAssetImage);
+    if (!map.fancyBorder.img) loadImage(map.fancyBorder);
+    // if (!map.characterInititativeBorder.img) loadImage(map.characterInititativeBorder);
+    if (!map.initiativeLeftDecorator.img) loadImage(map.initiativeLeftDecorator);
+    if (!map.initiativeRightDecorator.img) loadImage(map.initiativeRightDecorator);
+}
 
 
 function checkForCharacters(map: mapType, charactersSource: characterType[]){

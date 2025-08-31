@@ -52,6 +52,7 @@ export type mapType = assetType & {
     canvas: CanvasRenderingContext2D,
     rawCanvas: HTMLCanvasElement,
     assets : characterType[],
+    assetsHashedTable: Map<string, characterType>,
     pressedKeys: any,
     presets: mapPresets,
     mouseX :number,
@@ -163,10 +164,28 @@ export type mapType = assetType & {
     HoveredCharacterConditions?: ConditionDrawingData[],
     currentlyHoverAssetID?: string,
 
-    
+    inititiveCashedFromServer?: InitativeFromServer, 
+    initiative: characterType[],
+    initiativeElementsToMoveDown: characterType[],
+    initiativeElementsToMoveLeft: characterType[],
+    initiativeAnimationStage: number,
+    initiativeAnimationDistanceX: number,
+    initiativeLeftDecorator: characterType,
+    initiativeRightDecorator: characterType,
+    initiativeLeftDecoratorX?: number,
+    initiativeRightDecoratorX?: number,
+
+    fancyBorder: characterType,
+    // characterInititativeBorder: characterType
 }
 
 export type rightClickMenuType = {label:string, event: Function}[]
+
+type InitativeFromServer = {
+    queue: {id: string, name: string}[],
+    currentID: string
+}
+
 
  type shapesDrawnByUser = {
     userName: string,
@@ -186,6 +205,7 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         canvas: canvasContext,
         rawCanvas: canvas,
         assets: [],
+        assetsHashedTable: new Map(),
         x: 0,
         y: 0,
         sourceWidth: 0,
@@ -253,7 +273,15 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         drawingResizng: {ready: false, initialPoint: {x:0, y:0}, initialDistance:0, initialSize: 0, currentPoint:{x:0,y:0}},
         drawingRotating: {ready: false, referencePoint: {x:0, y:0}, previousPoint: {x:0, y:0}, initialAngle: 0},
         drawingMoving: {ready: false},
-
+        initiative: [],
+        initiativeElementsToMoveDown: [],
+        initiativeElementsToMoveLeft: [],
+        initiativeAnimationStage: 0,
+        initiativeAnimationDistanceX: 0,
+        initiativeLeftDecorator:  {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTxTW.png', name: 'ini-left', id: 'ini-left'},
+        initiativeRightDecorator: {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTxTQ.png', name: 'ini-rigth', id: 'ini-right'},
+        fancyBorder: {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTpmJ.webp', name: 'fancyBorder', id: 'fancyBorder'},
+        // characterInititativeBorder: {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTLyk.webp', name: 'ini-border', id: 'ini-border'},
     }
 
     return returned;
@@ -341,6 +369,14 @@ export type mapPresets = {
     CONDITION_BORDER_WIDTH: number,
     DISTANCE_BEFORE_CONDITION_FORCE: number,
     CONDITIONS_MARGIN_TOP: number,
+
+    INITIATIVE_MAX_WIDTH_PERCENTAGE : number,
+    INITIATIVE_DECORATOR_WIDTH: number,
+    INITIATIVE_DECORATOR_HEIGHT: number,
+    INITIATIVE_PADDING: number,
+    INITIATIVE_ASSET_SIZE: number,
+    INITIATIVE_DISTANCE_BETWEEN_ASSETS: number,
+    INITIATIVE_Y_POSITION: number
 }
 
 export function getMainMapPresets(){
@@ -411,8 +447,8 @@ export function getMainMapPresets(){
         HP_BAR_TEXT_OFFSET_Y: 8,
         HP_BAR_WIDTH_OVERFLOW: 10,
         HP_BAR_TEXT_ALIGN: 'center',
-        COORDINATES_BOX_X: 10,
-        COORDINATES_BOX_Y: 20,
+        COORDINATES_BOX_X: 30,
+        COORDINATES_BOX_Y: 60,
         COORDINATES_TEXT_FONT: '20px Laila',
         MOUSE_CLICK_TIME_FILTER: 200,
         SIZE_INCREASE_FILTER: 20,
@@ -426,6 +462,14 @@ export function getMainMapPresets(){
         CONDITION_BORDER_WIDTH: 4,
         DISTANCE_BEFORE_CONDITION_FORCE: 5,
         CONDITIONS_MARGIN_TOP: 50,
+
+        INITIATIVE_MAX_WIDTH_PERCENTAGE: 80,
+        INITIATIVE_DECORATOR_WIDTH: 20,
+        INITIATIVE_DECORATOR_HEIGHT: 35,
+        INITIATIVE_PADDING: 10,
+        INITIATIVE_ASSET_SIZE: 35,
+        INITIATIVE_DISTANCE_BETWEEN_ASSETS: 10,
+        INITIATIVE_Y_POSITION: 25
     }
     
     return returned;

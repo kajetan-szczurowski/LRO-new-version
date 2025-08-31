@@ -1,4 +1,5 @@
-import {useState, useRef} from 'react'
+// import {useState, useRef} from 'react'
+import { useRef} from 'react'
 import { useSocket } from '../../providers/SocketProvider'
 import { usersDataState } from '../../states/GlobalState';
 import HP from './HP';
@@ -9,13 +10,13 @@ export default function Combat() {
     const userID = usersDataState.value.userID;
     const userIsGM = usersDataState.value.isGM;
 
-    const [initiativeList, setInitiativeList] = useState<iniType[]>(() => {socket.emit('give-me-initiative'); return []});
-    const [activeElement, setActiveElement] = useState(() => {socket.emit('give-me-active-ini'); return '0'});
+    // const [initiativeList, setInitiativeList] = useState<iniType[]>(() => {socket.emit('give-me-initiative'); return []});
+    // const [activeElement, setActiveElement] = useState(() => {socket.emit('give-me-active-ini'); return '0'});
     const inputRef = useRef<HTMLInputElement>(null);
     const npcHpTerminalRef = useRef<HTMLInputElement>(null);
 
-    socket.on('initiative-order', order => {setInitiativeList(order)});
-    socket.on('active-initiative-element', value => setActiveElement(value));
+    // socket.on('initiative-order', order => {setInitiativeList(order)});
+    // socket.on('active-initiative-element', value => setActiveElement(value));
 
 
     return(
@@ -26,7 +27,7 @@ export default function Combat() {
             {userIsGM && <InitiativeForm />}
             {userIsGM && <button onClick = {()=> socket.emit('initiative-command', {userID: userID, command: 'previous'})} >Ini prev</button>}
             {userIsGM && <button onClick = {()=> socket.emit('initiative-command', {userID: userID, command: 'next'})} >Ini next</button>}
-            <ol>
+            {/* <ol>
                 {initiativeList.map(ini => {
                     const elementClass = activeElement == ini.id? 'initative-active-element' : '';
                     return(
@@ -34,7 +35,7 @@ export default function Combat() {
                     )
                 })}
             </ol>
-            {initiativeList.length === 0 && <div>No combat so far. Please make something stupid to trigger a combat.</div>}
+            {initiativeList.length === 0 && <div>No combat so far. Please make something stupid to trigger a combat.</div>} */}
        </>
 
     )
@@ -74,7 +75,7 @@ export default function Combat() {
 
 }
 
-type iniType = {
-    value: string,
-    id: string
-}
+// type iniType = {
+//     value: string,
+//     id: string
+// }

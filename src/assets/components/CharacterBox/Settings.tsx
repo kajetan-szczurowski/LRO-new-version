@@ -8,9 +8,18 @@ const AURA_COLOR_KEY = 'LRO-application-aura-color';
 const DRAWING_COLOR_KEY = 'LRO-application-drawing-color';
 const SHOW_COORDINATES_KEY = 'LRO-application-show-coordinates';
 const HIDE_CONDITIONS_KEY = 'LRO-application-hide-conditions';
+const INITATIVE_ANIMATION_KEY = 'LRO-application-initative-animation-hidden';
+const INITATIVE_HIDDEN_KEY = 'LRO-application-initative-hidden';
+const MAP_BORDER_HIDDEN_KEY = 'LRO-application-map-border-hidden';
+
+
 export const stepSounds = signal(numericDefaultFromStorage(APP_SETTINGS_STEPS_SOUND));
 export const showCoordinates = signal(numericDefaultFromStorage(SHOW_COORDINATES_KEY));
 export const hideConditions = signal(numericDefaultFromStorage(HIDE_CONDITIONS_KEY));
+export const initiativeAnimationHidden = signal(numericDefaultFromStorage(INITATIVE_ANIMATION_KEY));
+export const initiativeBoxHidden = signal(numericDefaultFromStorage(INITATIVE_HIDDEN_KEY));
+export const mapBorderHidden = signal(numericDefaultFromStorage(MAP_BORDER_HIDDEN_KEY));
+
 
 
 export default function Settings() {
@@ -23,15 +32,23 @@ export default function Settings() {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const stepButtonText = stepSounds.value? 'Steps sound active' : 'Steps sound muted';
     const showCoordinatesButtonText = showCoordinates.value? 'Coordinates visible' : 'Coordinates hidden';
-    const HideConditionsButtonText = hideConditions.value? 'Conditions hidden' : 'Conditions visible';
+    const hideConditionsButtonText = hideConditions.value? 'Conditions hidden' : 'Conditions visible';
+    const hideInitiativeButtonText = initiativeBoxHidden.value? 'Initiative hidden' : 'Initiative visible';
+    const hideInitiativeAnimationButtonText = `Initiative animation ${initiativeAnimationHidden.value? 'hidden' : 'visible'}`;
+    const hideMapBorderButtonText = `Map border ${mapBorderHidden.value? 'hidden' : 'visible'}`;
+
 
     return(
         <dialog className='settings-dialog' ref = {dialogRef}>
           <h2>Application's Settings</h2>
           <div className = 'settings-buttons'>
-            <button onClick = {() => handleClick(stepSounds, APP_SETTINGS_STEPS_SOUND)} className= {'character-box-button character-box-clickable'}> {stepButtonText} </button>
-            <button onClick = {() => handleClick(showCoordinates, SHOW_COORDINATES_KEY)} className= {'character-box-button character-box-clickable'}> {showCoordinatesButtonText} </button>
-            <button onClick = {() => handleClick(hideConditions, HIDE_CONDITIONS_KEY)} className= {'character-box-button character-box-clickable'}> {HideConditionsButtonText} </button>
+            <button onClick = {() => handleNumericClick(stepSounds, APP_SETTINGS_STEPS_SOUND)} className= {'character-box-button character-box-clickable'}> {stepButtonText} </button>
+            <button onClick = {() => handleNumericClick(showCoordinates, SHOW_COORDINATES_KEY)} className= {'character-box-button character-box-clickable'}> {showCoordinatesButtonText} </button>
+            <button onClick = {() => handleNumericClick(hideConditions, HIDE_CONDITIONS_KEY)} className= {'character-box-button character-box-clickable'}> {hideConditionsButtonText} </button>
+            <button onClick = {() => handleNumericClick(initiativeBoxHidden, INITATIVE_HIDDEN_KEY)} className= {'character-box-button character-box-clickable'}> {hideInitiativeButtonText} </button>
+            <button onClick = {() => handleNumericClick(initiativeAnimationHidden, INITATIVE_ANIMATION_KEY)} className= {'character-box-button character-box-clickable'}> {hideInitiativeAnimationButtonText} </button>
+            <button onClick = {() => handleNumericClick(mapBorderHidden, MAP_BORDER_HIDDEN_KEY)} className= {'character-box-button character-box-clickable'}> {hideMapBorderButtonText} </button>
+          
           </div>
           <MironsAura/>
           <br/>
@@ -39,11 +56,12 @@ export default function Settings() {
         </dialog>
     )
 
-    function handleClick(processingSignal: Signal<number>, storageKey: string){
+    function handleNumericClick(processingSignal: Signal<number>, storageKey: string){
       processingSignal.value = processingSignal.value? 0: 1;
       localStorage.setItem(storageKey, processingSignal.value? '1' : '0');
-      if (dialogRef.current) dialogRef.current.close();
+      // if (dialogRef.current) dialogRef.current.close();
     }
+
 
     function MironsAura(){
       const buttonClass = (numericValue: number) => `character-box-button ${mironButtonClassName(numericValue)} settings-button`;
@@ -104,3 +122,4 @@ export function triggerSettingsWindow(){
     if (!fromStorage) return 0;
     return Number(fromStorage);
   }
+

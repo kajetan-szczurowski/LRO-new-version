@@ -830,7 +830,29 @@ input.color-picker-color-box{
   row-gap: 0.5rem;
 }
 
+.initiative-image{
+  height: 80px;
+  aspect-ratio: 1;
+}
 
+/* .initiative-character{
+  position: absolute;
+} */
+
+.initiative-box{
+  height: 80px;
+  aspect-ratio: 1;
+}
+
+.initative-box{
+  display: flex;
+}
+
+@media(max-width: 1800px){
+  #character-info{
+    max-height: 75vh;
+  }
+}
 
 @media (max-width: 800px){
   body {

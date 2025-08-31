@@ -1,4 +1,4 @@
-export default function ConditionForceOptions({maxNumber = 5}: props) {
+export default function ConditionForceOptions({maxNumber = 10}: props) {
     return(
             <>
                 {[...Array(maxNumber + 1).keys()].map(forceValue => {

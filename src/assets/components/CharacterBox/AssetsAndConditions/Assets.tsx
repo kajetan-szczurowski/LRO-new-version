@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { useSocket } from '../../../providers/SocketProvider'
 import { usersDataState } from '../../../states/GlobalState';
 import NumericAndTextSpans from '../../NumericAndTextSpans';
-import { characterType } from '../../Map/mapTypes';
+// import { characterType } from '../../Map/mapTypes';
 import ConditionPicker from './ConditionPicker';
 import { signal } from '@preact/signals-react';
 import { currentAssetConditionState } from './conditionPickState';
@@ -20,7 +20,7 @@ export default function Assets() {
     const newNameRef = useRef<HTMLInputElement>(null);
 
     const userID = usersDataState.value.userID;
-    const [assetsList, setAssetsList] = useState<characterType[]>(() => { socket.emit('give-me-assets-data', userID); return [] });
+    // const [assetsList, setAssetsList] = useState<characterType[]>(() => { socket.emit('give-me-assets-data', userID); return [] });
 
     // socket.on('assets-data', payload => setAssetsList(payload));
     // socket.on('map-assets', payload => setAssetsList(payload));

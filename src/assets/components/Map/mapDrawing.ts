@@ -1,7 +1,7 @@
 import { mapType, characterType, ConditionDrawingData } from "./mapTypes";
 import { DrawingData } from "./mapDrawingMode";
 import { degreesToRadians, euclideanDistance } from "./mapMath";
-import { showCoordinates, hideConditions } from "../CharacterBox/Settings";
+import { showCoordinates, hideConditions, initiativeBoxHidden, mapBorderHidden } from "../CharacterBox/Settings";
 
 
 export function drawAll(map: mapType){
@@ -17,9 +17,38 @@ export function drawAll(map: mapType){
     drawPing(map);
     drawHP(map);
     drawConditions(map);
+    drawInitiative(map);
     drawContextMenu(map);
+    drawFancyBorder(map);
     map.frameDrawing = false;
 
+}
+
+function drawFancyBorder(map: mapType){
+    if (mapBorderHidden.value) return;
+    if (!map.fancyBorder.img || !map.fancyBorder.sourceWidth || !map.fancyBorder.sourceHeight ) return;
+    map.canvas.drawImage(map.fancyBorder.img, 0, 0, map.fancyBorder.sourceWidth, map.fancyBorder.sourceHeight, 0, 0, map.rawCanvas.width, map.rawCanvas.height);
+}
+
+function drawInitiative(map: mapType){
+    if (initiativeBoxHidden.value) return;
+
+    if (map.initiativeLeftDecoratorX) drawInitiativeDecorator(map, map.initiativeLeftDecorator, map.initiativeLeftDecoratorX);
+    if (map.initiativeRightDecoratorX) drawInitiativeDecorator(map, map.initiativeRightDecorator, map.initiativeRightDecoratorX);
+
+    map.initiative.forEach(ini => {
+        if (!ini.img || !ini.sourceWidth || !ini.sourceHeight || !ini.size) return;
+        map.canvas.drawImage(ini.img, 0, 0, ini.sourceWidth, ini.sourceHeight, ini.x, ini.y, ini.size, ini.size);
+        drawRectangle({canvasContext: map.canvas, x: ini.x, y: ini.y, width: ini.size, height: ini.size, lineWidth: 2, strokeStyle: 'black'});
+    })
+}
+
+function drawInitiativeDecorator(map:mapType, decorator: characterType, pointX: number | undefined){
+    if (!pointX) return;
+    if (!decorator.img || !decorator.sourceWidth || !decorator.sourceHeight) return;
+    const [rawWidth, rawHeight] = [decorator.sourceWidth, decorator.sourceHeight];
+    const [drawWidth, drawHeigt] = [map.presets.INITIATIVE_DECORATOR_WIDTH, map.presets.INITIATIVE_DECORATOR_HEIGHT];
+    map.canvas.drawImage(decorator.img, 0, 0, rawWidth, rawHeight, pointX, map.presets.INITIATIVE_Y_POSITION, drawWidth, drawHeigt);
 }
 
 function drawDrawingDuringEdit(map: mapType){
@@ -87,9 +116,14 @@ function drawUsersShape(map: mapType, shapeName: string, preview = true, customS
 
 function drawCoordinates(map: mapType){
     if (!showCoordinates.value) return;
-    writeText({canvasContext: map.canvas, x:map.presets.COORDINATES_BOX_X, y: map.presets.COORDINATES_BOX_Y, font: map.presets.COORDINATES_TEXT_FONT, 
-        fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, text: `x: ${Math.round(map.absoluteMouseX)} y: ${Math.round(map.absoluteMouseY)}`, 
+    function write(textToWrite: string, positionY: number){
+        writeText({canvasContext: map.canvas, x:map.presets.COORDINATES_BOX_X, y: positionY, font: map.presets.COORDINATES_TEXT_FONT, 
+        fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, text: textToWrite, 
         strokeStyle: map.presets.DISTANCE_FONT_STROKE_STYLE})
+    }
+    
+    write(`x: ${Math.round(map.absoluteMouseX)}`, map.presets.COORDINATES_BOX_Y);
+    write(`y: ${Math.round(map.absoluteMouseY)}`, map.presets.COORDINATES_BOX_Y + 20);
 }
 
 function drawOneCondition(map:mapType, condition: ConditionDrawingData){

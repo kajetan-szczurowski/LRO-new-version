@@ -5,6 +5,7 @@ import { mapType } from "./mapTypes";
 import * as geometry from "./mapMath";
 import { getDrawingData } from "./mapDrawingMode";
 import { signal } from "@preact/signals-react";
+import { handleCharactersDataChange, handleInitiativeChangeCurrent, handleInitiativeFromServer } from "./mapCharacters";
 
 export const mapCharacters = signal<characterType[]>([]);
 
@@ -52,9 +53,28 @@ export default function Map() {
 
       case 'map-assets':{
         characters.splice(0, characters.length + 1);
-        if (args.length) args.forEach((a: any) => characters.push(a));
+        if (args.length) args.forEach((a: any) => {
+          characters.push(a);
+          mapData.assetsHashedTable.set(a.id, a);
+        });
         if (!args.length) mapData.toBeRedrawn = true;
         mapCharacters.value = characters;
+        return;
+      }
+
+      case 'map-assets-just-data':{
+        
+        handleCharactersDataChange(mapData, args);
+        return;
+      }
+
+      case 'initiative-change':{
+        handleInitiativeFromServer(args.queue, args.active, mapData);
+        return;
+      }
+
+      case 'new-initiative-current':{
+        handleInitiativeChangeCurrent(args, mapData);
         return;
       }
 

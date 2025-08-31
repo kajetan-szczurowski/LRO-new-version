@@ -99,7 +99,7 @@ export default function MapGraphics() {
     function addToMap(ass: {url: string, label:string}){
         const size = getSize();
         const cords = {...mapDataState.value};
-        socket.emit('add-to-map', {userID: userID, assetURL: ass.url, size: size, name: ass.label, x: cords.x, y: cords.y});
+        socket.emit('add-to-map', {userID: userID, assetURL: ass.url, size: size, name: ass.label, x: cords.x + 50, y: cords.y + 50});
     }
 
     function changeMap(map: string){

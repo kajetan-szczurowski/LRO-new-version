@@ -1,5 +1,5 @@
 import { CharacterCondition, getDefaultDrawing, mapType } from "./mapTypes"
-import { isMouseOnCharacter } from "./mapCharacters";
+import { isMouseOnCharacter, prepareInitative } from "./mapCharacters";
 import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
 import { initContextMenu, handleRightMenuMouseDown, closeContextMenu, drawingSelectedContextMenu } from "./mapRightClickMenu";
@@ -17,7 +17,7 @@ export function canvasEventListeners(map: mapType){
     map.rawCanvas.addEventListener('contextmenu', (e) => handleContextMenu(e, map));
     map.rawCanvas.addEventListener('dblclick', () => handleDoubleClick(map));
     // map.rawCanvas.ondblclick(() => handleDoubleClick(map));
-    addEventListener('resize', () => {map.resized = true})
+    addEventListener('resize', () => handleResize(map));
     addEventListener('keydown', (e) => handleKeyDown(e, map));
     addEventListener("keyup", event => {map.pressedKeys[event.key] = false});
 }
@@ -67,6 +67,11 @@ export function handleMeasure(map:mapType){
     
     if (!map.measuring && enable) startMeasuring(map);
     if (map.measuring && disable) stopMeasuring(map);
+}
+
+function handleResize(map: mapType){
+    map.resized = true
+    prepareInitative(map);
 }
 
 
@@ -564,7 +569,7 @@ function handleHP(map: mapType){
                         forceX = currentCondition.force? currentValueX + baseWidth + map.presets.DISTANCE_BEFORE_CONDITION_FORCE : 0;
                         currentWidth = baseWidth + widthAppendixForForce + widthAddition * 2;
                         conditionY =  startingY + (row * (conditionHeight + map.presets.CONDITION_GRID_GAP));
-                        map.HoveredCharacterConditions.push({x: currentValueX, forceX: forceX, y:conditionY, height: conditionHeight, width: currentWidth, ...currentCondition});
+                        map.HoveredCharacterConditions.push({x: currentValueX - map.x, forceX: forceX - map.x, y:conditionY - map.y, height: conditionHeight, width: currentWidth, ...currentCondition});
                         if (currentWidth > maxWidth) maxWidth = currentWidth;
                     }
 

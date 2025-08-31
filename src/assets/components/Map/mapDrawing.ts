@@ -32,6 +32,7 @@ function drawFancyBorder(map: mapType){
 
 function drawInitiative(map: mapType){
     if (initiativeBoxHidden.value) return;
+    if (!map.initiative.length) return;
 
     if (map.initiativeLeftDecoratorX) drawInitiativeDecorator(map, map.initiativeLeftDecorator, map.initiativeLeftDecoratorX);
     if (map.initiativeRightDecoratorX) drawInitiativeDecorator(map, map.initiativeRightDecorator, map.initiativeRightDecoratorX);

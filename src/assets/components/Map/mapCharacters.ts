@@ -69,7 +69,7 @@ export function handleInitativeAnimation(map:mapType){
         case 3:{
             for (let i = 0; i< map.initiativeElementsToMoveDown.length; i++)
                 if (map.initiativeElementsToMoveDown[i].aimedX !== map.initiativeElementsToMoveDown[i].x) return;
-            map.initiativeElementsToMoveDown.forEach(element => element.aimedY = map.presets.INITIATIVE_Y_POSITION);
+            map.initiativeElementsToMoveDown.forEach(element => element.aimedY = map.initiativeYPosition);
             map.initiativeAnimationStage = 4;
             return;
         }
@@ -120,6 +120,7 @@ export function handleInitiativeFromServer(queue: {id: string, name: string}[], 
 
 export function prepareInitative(map: mapType){
     if (!map.inititiveCashedFromServer) return;
+    map.initiativeYPosition = map.presets.INITIATIVE_Y_POSITION_PERCENTAGE * map.rawCanvas.height / 100;
     map.initiative = [];
     const {initativesCount, initiativeMargin} = getInitiativeGeometry(map);
     map.initiativeLeftDecoratorX = initiativeMargin;
@@ -141,7 +142,7 @@ export function prepareInitative(map: mapType){
         if (!currentCharacter) return;
         const newIniElement = {...currentCharacter};
         newIniElement.size = map.presets.INITIATIVE_ASSET_SIZE;
-        newIniElement.y = map.presets.INITIATIVE_Y_POSITION;
+        newIniElement.y = map.initiativeYPosition;
         newIniElement.x = currentX;
         newIniElement.aimedY = newIniElement.y;
         newIniElement.aimedX = newIniElement.x;

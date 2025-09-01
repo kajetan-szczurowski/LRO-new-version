@@ -49,7 +49,7 @@ function drawInitiativeDecorator(map:mapType, decorator: characterType, pointX: 
     if (!decorator.img || !decorator.sourceWidth || !decorator.sourceHeight) return;
     const [rawWidth, rawHeight] = [decorator.sourceWidth, decorator.sourceHeight];
     const [drawWidth, drawHeigt] = [map.presets.INITIATIVE_DECORATOR_WIDTH, map.presets.INITIATIVE_DECORATOR_HEIGHT];
-    map.canvas.drawImage(decorator.img, 0, 0, rawWidth, rawHeight, pointX, map.presets.INITIATIVE_Y_POSITION, drawWidth, drawHeigt);
+    map.canvas.drawImage(decorator.img, 0, 0, rawWidth, rawHeight, pointX, map.initiativeYPosition, drawWidth, drawHeigt);
 }
 
 function drawDrawingDuringEdit(map: mapType){

@@ -172,6 +172,7 @@ export type mapType = assetType & {
     initiativeAnimationDistanceX: number,
     initiativeLeftDecorator: characterType,
     initiativeRightDecorator: characterType,
+    initiativeYPosition: number,
     initiativeLeftDecoratorX?: number,
     initiativeRightDecoratorX?: number,
 
@@ -278,6 +279,7 @@ export function getDefaultMap(canvasContext: CanvasRenderingContext2D, canvas: H
         initiativeElementsToMoveLeft: [],
         initiativeAnimationStage: 0,
         initiativeAnimationDistanceX: 0,
+        initiativeYPosition: 0,
         initiativeLeftDecorator:  {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTxTW.png', name: 'ini-left', id: 'ini-left'},
         initiativeRightDecorator: {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTxTQ.png', name: 'ini-rigth', id: 'ini-right'},
         fancyBorder: {x: 0, y: 0, graphicUrl: 'https://s14.gifyu.com/images/bTpmJ.webp', name: 'fancyBorder', id: 'fancyBorder'},
@@ -376,7 +378,7 @@ export type mapPresets = {
     INITIATIVE_PADDING: number,
     INITIATIVE_ASSET_SIZE: number,
     INITIATIVE_DISTANCE_BETWEEN_ASSETS: number,
-    INITIATIVE_Y_POSITION: number
+    INITIATIVE_Y_POSITION_PERCENTAGE: number
 }
 
 export function getMainMapPresets(){
@@ -469,7 +471,7 @@ export function getMainMapPresets(){
         INITIATIVE_PADDING: 10,
         INITIATIVE_ASSET_SIZE: 35,
         INITIATIVE_DISTANCE_BETWEEN_ASSETS: 10,
-        INITIATIVE_Y_POSITION: 25
+        INITIATIVE_Y_POSITION_PERCENTAGE: 4.5
     }
     
     return returned;

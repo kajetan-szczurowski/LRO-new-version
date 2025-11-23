@@ -26,9 +26,9 @@ export default function Map() {
   )
 
   function mapExternalControl(controlWord: string, args: any, mapData: mapType){
+    const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
     switch(controlWord){
       case 'move-order-output':{
-        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         const newPoint = movePropositionMiddleware(args[0], args[1], args[2], mapData);
         socket.emit('move-proposition', {id: args[0], limitedPosition: {x: newPoint.x, y: newPoint.y}, fullPosition:{x:args[1], y:args[2]}, userID: loggedUserID});
         return;
@@ -79,13 +79,11 @@ export default function Map() {
       }
 
       case 'delete-asset':{
-        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         socket.emit('delete-asset', {assetID: args[0], userID: loggedUserID});
         return;
       }
 
       case 'ping-order':{
-        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         socket.emit('ping-order', {x: args[0], y: args[1], userID: loggedUserID});
         return;
       }
@@ -105,7 +103,6 @@ export default function Map() {
       }
 
       case 'delete-drawing-order': {
-        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         const id = mapData.editingDrawing.id;
         const drawingOwner = mapData.editingDrawing.userName;
         socket.emit('delete-drawing', {userID: loggedUserID, drawingID: id, owner: drawingOwner});
@@ -114,7 +111,6 @@ export default function Map() {
       }
 
       case 'edit-drawing-order': {
-        const loggedUserID = sessionStorage.getItem(SESSION_STORAGE_LOGIN_ID_KEY);
         const {linePoint1, linePoint2, angle, size} = getDrawingData(mapData);
         const [x, y] = [mapData.editingDrawing.x, mapData.editingDrawing.y];
         const drawingLine = mapData.editingDrawing.shapeType === 'line';
@@ -127,7 +123,12 @@ export default function Map() {
       case 'drawings':{
         mapData.drawnShapes = args;
         mapData.toBeRedrawn = true;
+        return;
       }
+
+      case 'change-active-initiative':
+        socket.emit('initiative-update-current', {userID: loggedUserID, currentID: args[0]});
+        return;
     }
   }
 

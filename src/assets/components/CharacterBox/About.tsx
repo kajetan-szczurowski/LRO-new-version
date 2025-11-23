@@ -1,6 +1,7 @@
 import { characterElementType } from '../../types/characterTypes'
 import { characterData } from './CharacterBox';
 import EditableAttribute from './Editables/EditableAttribute';
+// import Importer from './ImportFromWanderer/Importer';
 
 export default function About() {
   const aboutData = characterData.value?.about;
@@ -12,6 +13,7 @@ export default function About() {
     <div  className = "character-info">
       <div className = 'about-box'>
         <div className = 'about-text'>
+          {/* <Importer /> */}
           <h1>{characterData.value?.name}</h1>
             {/* <ListWithHeader data = {aboutData?.generalInfo.length? aboutData.generalInfo : []} attributeGroup = 'generalInfo'/> */}
             {aboutData?.generalInfo.length && <ListDisplayer data = {aboutData?.generalInfo} group = 'generalInfo'/>}

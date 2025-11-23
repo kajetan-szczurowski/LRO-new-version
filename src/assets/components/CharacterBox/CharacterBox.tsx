@@ -17,7 +17,7 @@ import { usersDataState } from '../../states/GlobalState';
 import { useSocket } from '../../providers/SocketProvider';
 import EditAttributeDialog from './Editables/EditAttributeDialog';
 import Assets from './AssetsAndConditions/Assets';
-import Initiative from './Initiative';
+import Initiative from './Initiative/Initiative';
 
 const chosenCharacterStorageKey = 'lets-roll-one-chosenID';
 const charactersMapStorageKey = 'lets-roll-one-charactersMap';
@@ -26,6 +26,7 @@ const charactersStateStorageKey = 'lets-roll-one-charactersState';
 export const characterData = signal<characterDataType | undefined>(getPlaceholderData());
 export const characterMapSignal = signal<characterMap>({});
 export const characterNameSignal = signal<string>("");
+export const selectedCharacterToEdit = signal<string>("");
 
 export default function CharacterBox() {
     const [charactersMap, setCharactersMap] = useLocalStorage<characterMap>(charactersMapStorageKey, {});
@@ -201,32 +202,6 @@ function CharacterChanger({ currentID, mainState}: changerProps){
 
 }
 
-// function useDefaultCharactersMap(setter: React.Dispatch<React.SetStateAction<characterMap>>){
-  // async function getList(){
-  //   try{
-
-  //     const data = await fetch('http://localhost:3000/charactersIDMap');
-  //     const jsoned = await data.json();
-  //     setter(jsoned);
-
-  //   }catch{return}
-  // }
-
-  // useEffect(() => {getList()}, [])
-// }
-
-// function usePreviousCharacterData(state: Signal<characterDataType>, id:string){
-//   async function fetchData(){
-//     try{
-//       const data = await fetch('http://localhost:3000/character');
-//       const processed = await data.json();
-//       state.value = processed;
-
-//     }catch{ return; }
-//   } 
-//   if (id === '') return;
-//   useEffect(() => {fetchData()}, []);
-// }
 
 }
 

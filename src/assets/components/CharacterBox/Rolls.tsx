@@ -6,19 +6,33 @@ import { useRef } from 'react';
 import { useSocket } from '../../providers/SocketProvider';
 import { usersDataState } from '../../states/GlobalState';
 import { getDamageIcons } from '../DamageIcons';
+import GameMasterRolls from '../GameMasterBox/GameMasterRolls';
+import { useSessionStorage } from '../../hooks/useStorage';
 
 
 export default function Rolls() {
+    const ROLLS_WINDOW_STORAGE_KEY = 'LRO-roll-window-state';
+    const [rollsWindow, setRollsWindow] = useSessionStorage<string>(ROLLS_WINDOW_STORAGE_KEY, 'characters-rolls');
     const rollsData = characterData.value?.rolls;
     if (!rollsData) return;
     const Families = withInputFilter(RollsFamilies);
     const rolledUp = {};
   return (
     <div className = "character-info">
-        <Families rolls = {rollsData} rolledDictionary = {rolledUp}/>
+        {usersDataState.value.isGM && <GMRollsToggle/>}
+        {rollsWindow === 'characters-rolls' && <Families rolls = {rollsData} rolledDictionary = {rolledUp}/>}
+        {rollsWindow === 'gms-rolls' && <GameMasterRolls />}
     </div>
   )
 
+    function GMRollsToggle(){
+        return(
+            <div>
+                <button onClick = {() => setRollsWindow('gms-rolls')}>GM</button>
+                <button onClick = {() => setRollsWindow('characters-rolls')}>Character</button>
+            </div>
+        )
+    }
 
 }
 
@@ -149,6 +163,7 @@ function RollsFamilies({rolls, filter, rolledDictionary}:familiesProps){
         // if (currentFamilyList.length > 0) families.push(currentFamilyList);
         return families;
     }
+
 }
 
 function getFamiliesNames(rolls: characterElementType[]){

@@ -1,4 +1,4 @@
-import { CharacterCondition, getDefaultDrawing, mapType } from "./mapTypes"
+import { CharacterCondition, characterType, getDefaultDrawing, mapType } from "./mapTypes"
 import { isMouseOnCharacter, prepareInitative } from "./mapCharacters";
 import { mapDataState } from "../../states/GlobalState";
 import * as mapMath from "./mapMath";
@@ -12,6 +12,7 @@ export function canvasEventListeners(map: mapType){
     map.rawCanvas.addEventListener('click', () => handleClick(map));
     map.rawCanvas.addEventListener('mousedown', () => handleMouseDown(map));
     map.rawCanvas.addEventListener('mouseup', () => handleMouseUp(map));
+    window.addEventListener('blur', () => map.pressedKeys = {});
 
 
     map.rawCanvas.addEventListener('contextmenu', (e) => handleContextMenu(e, map));
@@ -194,6 +195,18 @@ export function handleScrolling(map:mapType){
     // handleMapBorderLogic(map);
 }
 
+function handleRightClickOnInitiativeElement(map: mapType){
+    if (!map.initiativeLeftDecoratorX || !map.initiativeRightDecoratorX) return;
+    if (map.mouseX < map.initiativeLeftDecoratorX || map.mouseX > map.initiativeRightDecoratorX) return;
+    if (map.mouseY > map.initiativeYPosition + map.presets.INITIATIVE_ASSET_SIZE + 10) return;
+    for (let i = 0; i < map.initiative.length; i++){
+        if (isMouseOnCharacter(map, map.initiative[i])) {
+            map.controllFunction('change-active-initiative', [map.initiative[i].id]);
+            return true;
+        }
+    }
+}
+
 function handleContextMenu(e:MouseEvent, map:mapType){
     e.preventDefault();
     if (map.activeAssetId){
@@ -203,6 +216,8 @@ function handleContextMenu(e:MouseEvent, map:mapType){
         map.activeSide = 0;
         stopMeasuring(map);
     }
+
+    if (handleRightClickOnInitiativeElement(map)) return;
 
     for(let i = map.assets.length - 1; i >= 0; i--){
         if (isMouseOnCharacter(map, map.assets[i])){
@@ -531,7 +546,10 @@ function handleHP(map: mapType){
                 map.currentAssetHP = currentHP;
                 }
 
-                //TODO: refactor, beacuse it assigns also conditions
+                //TODO: refactor, beacuse it assigns also conditions and defences
+
+                map.defencesText = '';
+                if (isGM) assignDefencesText(map, map.assets[i]);
 
                 const conditions = map.assets[i].conditions;
                 if (!conditions) return;
@@ -589,5 +607,19 @@ function handleHP(map: mapType){
     }
     map.maxAssetHP = 0;
     map.currentAssetHP = 0;
+
+}
+
+function assignDefencesText(map: mapType, asset: characterType){
+    const keysList = ['AC', 'DC', 'Perception', 'Fortitude', 'Reflex', 'Will'];
+    keysList.forEach(key => handleDefence(key as keyof characterType));
+    if (map.defencesText?.length) map.defencesText = map.defencesText.substring(0, map.defencesText.length - 2);
+
+    function handleDefence(key: keyof characterType) {
+        if (!asset[key]) return;
+        if (!Number(asset[key])) return;
+        const label = key === 'AC' || key == 'DC'? key: key.charAt(0);
+        map.defencesText += `${label}: ${asset[key]} | `;
+    }
 
 }

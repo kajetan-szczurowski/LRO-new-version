@@ -2,6 +2,7 @@ import { mapType, characterType, ConditionDrawingData } from "./mapTypes";
 import { DrawingData } from "./mapDrawingMode";
 import { degreesToRadians, euclideanDistance } from "./mapMath";
 import { showCoordinates, hideConditions, initiativeBoxHidden, mapBorderHidden } from "../CharacterBox/Settings";
+import { selectedCharacterToEdit } from "../CharacterBox/CharacterBox";
 
 
 export function drawAll(map: mapType){
@@ -15,7 +16,7 @@ export function drawAll(map: mapType){
     drawMiniMap(map);
     drawCoordinates(map);
     drawPing(map);
-    drawHP(map);
+    drawAssetData(map);
     drawConditions(map);
     drawInitiative(map);
     drawContextMenu(map);
@@ -144,10 +145,22 @@ function drawConditions(map: mapType){
     });
 }
 
-function drawHP(map: mapType){
+function drawAssetData(map: mapType){
     if (!map.maxAssetHP) return;
     if (map.currentAssetHP === undefined || map.currentAssetHP === null) return;
     if (map.measuring) return;
+    drawHP(map);
+    if (!map.defencesText) return;
+    const dataWidth = map.canvas.measureText(map.defencesText).width * 2;
+    const rectangleX = map.HPBarX - dataWidth / 2;
+    drawRectangle({canvasContext: map.canvas, x:rectangleX, y:30, width: dataWidth, height: 30, fillStyle: '#493f33'});
+    drawRectangle({canvasContext: map.canvas, x: rectangleX, y: 30, width: dataWidth, height: 30, strokeStyle: 'black', lineWidth: 3});
+    writeText({canvasContext: map.canvas, x:map.HPBarX, y: 50, text: map.defencesText, textAlign: 'center',
+    font: map.presets.COORDINATES_TEXT_FONT, fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, strokeStyle: map.presets.DISTANCE_FONT_STROKE_STYLE})
+}
+
+function drawHP(map: mapType){
+
     const borderX = map.HPBarX - map.presets.HP_BAR_BORDER_THICKNESS / 2;
     const borderWidth = map.HPBarWrapperWidth + map.presets.HP_BAR_BORDER_THICKNESS;
     const borderY = map.HPBarY - map.presets.HP_BAR_BORDER_THICKNESS / 2;
@@ -237,9 +250,15 @@ function drawAsset(asset: characterType, map: mapType){
             sourceHeight = map.deadAssetImage.img.height;
         } 
     map.canvas.drawImage(imageSource, 0, 0, sourceWidth, sourceHeight, onCanvasX, onCanvasY, asset.size, asset.size);
-    if (asset.active)
+
+    const assetSelected = asset.id === selectedCharacterToEdit.value;
+    let rectangleColor = '';
+    if (assetSelected) rectangleColor = 'magenta';
+    if (asset.active) rectangleColor = map.presets.ASSET_ACTIVE_STROKE_STYLE;
+
+    if (asset.active || assetSelected)
         drawRectangle({canvasContext: map.canvas, x:onCanvasX, y:onCanvasY, width:asset.size, 
-                       height:asset.size, strokeStyle: map.presets.ASSET_ACTIVE_STROKE_STYLE, lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH});
+                       height:asset.size, strokeStyle: rectangleColor, lineWidth: map.presets.ASSET_ACTIVE_LINE_WIDTH});
 
     asset.toBeRedrawn = false;
 

@@ -35,7 +35,7 @@ export type assetType = {
 
 }
 
-export type characterType = assetType & {
+export type characterType = assetType & playableType &{
     aimedX?: number,
     aimedY?: number,
     id: string,
@@ -44,6 +44,15 @@ export type characterType = assetType & {
     currentHP?: number,
     maxHP?: number,
     conditions?: CharacterCondition[]
+}
+
+export type playableType = {
+    AC?: number,
+    DC?: number,
+    Perception?: number,
+    Reflex?: number,
+    Will?: number,
+    Fortitude?: number
 }
 
 export type mapType = assetType & {
@@ -177,6 +186,7 @@ export type mapType = assetType & {
     initiativeRightDecoratorX?: number,
 
     fancyBorder: characterType,
+    defencesText?: string
     // characterInititativeBorder: characterType
 }
 

@@ -41,6 +41,12 @@ export function handleCharactersDataChange(map: mapType, newData: characterType[
           map.assets[i].currentHP = characterReadFromHash.currentHP;
           map.assets[i].maxHP = characterReadFromHash.maxHP;
           map.assets[i].name = characterReadFromHash.name;
+          map.assets[i].AC = characterReadFromHash.AC;
+          map.assets[i].DC = characterReadFromHash.DC;
+          map.assets[i].Perception = characterReadFromHash.Perception;
+          map.assets[i].Reflex = characterReadFromHash.Reflex;
+          map.assets[i].Will = characterReadFromHash.Will;
+          map.assets[i].Fortitude = characterReadFromHash.Fortitude;
         }
         mapCharacters.value = map.assets;
 }
@@ -134,6 +140,7 @@ export function prepareInitative(map: mapType){
     let queueIndex = queueStartIndex;
     let currentX = initiativeMargin + map.presets.INITIATIVE_DECORATOR_WIDTH + map.presets.INITIATIVE_PADDING;
     const increaseX = map.presets.INITIATIVE_ASSET_SIZE + map.presets.INITIATIVE_DISTANCE_BETWEEN_ASSETS;
+
     
     for (let i = 0; i < initativesCount; i++){
         if (queueIndex >= queue.length) queueIndex = 0;
@@ -155,13 +162,16 @@ export function prepareInitative(map: mapType){
 }
 
 function getInitiativeGeometry(map: mapType){
+    if (!map.inititiveCashedFromServer) return {initativesCount: 0, initiativeMargin: 0};
+    const initiativeLength = map.inititiveCashedFromServer.queue.length;
     const presets = map.presets;
     const reservedWidth = Math.floor(map.rawCanvas.width * presets.INITIATIVE_MAX_WIDTH_PERCENTAGE / 100);
     const decoratorsWidth = 2 * presets.INITIATIVE_DECORATOR_WIDTH;
     const paddingsWidth = 2 * presets.INITIATIVE_PADDING;
     const lengthNumerator = reservedWidth - decoratorsWidth - paddingsWidth + presets.INITIATIVE_DISTANCE_BETWEEN_ASSETS;
     const lengthDenominator = presets.INITIATIVE_ASSET_SIZE + presets.INITIATIVE_DISTANCE_BETWEEN_ASSETS;
-    const length = Math.floor(lengthNumerator / lengthDenominator);
+    const MaximalLength = Math.floor(lengthNumerator / lengthDenominator);
+    const length = (MaximalLength > initiativeLength)? initiativeLength : MaximalLength;
     const trueWidth = decoratorsWidth + paddingsWidth + length * presets.INITIATIVE_ASSET_SIZE + (length - 1) * presets.INITIATIVE_DISTANCE_BETWEEN_ASSETS;
     const margin = (map.rawCanvas.width - trueWidth) / 2;
     return {initativesCount: length, initiativeMargin: margin};  

@@ -59,7 +59,7 @@ export default function ProgressBar({widthRem, value, maxValue, foregroundClassN
       if (!currentValueRef.current || !maxValueRef.current) return;
       const proposedMax = getCheckedInputValue(maxValueRef.current.value) || maxValue;
       const newMax = proposedMax < 0? maxValue : proposedMax;
-      const newCurrent = prepareNewCurrentValue(currentValueRef.current.value, newMax) || value;
+      const newCurrent = prepareNewCurrentValue(currentValueRef.current.value, newMax) ?? value;
       socket.emit(socketEditKey, {value: newCurrent, max: newMax, userID: userID, characterID: id});
       if (!dialogRef.current) return;
       if (dialogRef.current.open) dialogRef.current.close();

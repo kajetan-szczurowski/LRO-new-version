@@ -13,6 +13,7 @@ import AuxilaryCharacterButton from './AuxilaryCharacterButton';
 import Combat from './Combat';
 import { triggerSettingsWindow } from './Settings';
 import { triggerControlsWindow } from './ControlsView';
+import { triggerGameStatesWindow } from './GameStates/GameStatesWindow';
 import { usersDataState } from '../../states/GlobalState';
 import { useSocket } from '../../providers/SocketProvider';
 import EditAttributeDialog from './Editables/EditAttributeDialog';
@@ -88,6 +89,7 @@ export default function CharacterBox() {
         <div id = 'login-bar'>
           <AuxilaryCharacterButton onClickEvent={triggerControlsWindow} label = 'question' />
           <AuxilaryCharacterButton onClickEvent={triggerSettingsWindow} label = 'gear' />
+          {userIsGM && <AuxilaryCharacterButton onClickEvent={triggerGameStatesWindow} label = 'disk' />}
           <AuxilaryCharacterButton onClickEvent={handleRefresh} label = 'refresh' />
           
           <Login/>

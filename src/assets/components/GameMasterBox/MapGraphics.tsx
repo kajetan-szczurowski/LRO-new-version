@@ -12,6 +12,7 @@ export default function MapGraphics() {
     const [assets, setAssets] = useState<graphicAssetType[]>(() => {socket.emit('get-assets', userID); return []});
     const [showMap, setShowMaps] = useState(false);
     const [showAssets, setShowAssets] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
     const sizeRef = useRef<HTMLInputElement>(null);
     const newAssetNameRef = useRef<HTMLInputElement>(null);
     const newAssetURLRef = useRef<HTMLInputElement>(null);
@@ -32,6 +33,7 @@ export default function MapGraphics() {
     return(
       <>
         <section id = 'admin-box'>
+            <button onClick = {() => setShowPreview(prev => !prev)}>{showPreview? 'Hide preview': 'Show preview'}</button>
             <Header label = 'Maps' callback = {() => setShowMaps(prev => !prev)} />
             <div className = {showMap? '' : 'display-none'}><MapsComponent/></div>
 
@@ -65,7 +67,12 @@ export default function MapGraphics() {
         return(
             <ol>
                 {filteredMaps.map(m => {
-                    return(<li key = {m.label} className = 'character-box-clickable' onClick = {() => changeMap(m.url)}>{m.label}</li>)
+                    return(
+                    <li key = {m.label} className = 'character-box-clickable' onClick = {() => changeMap(m.url)}>
+                        {m.label}
+                        {showPreview && <img src = {m.url} style = {{'width': '50px', height: '50px'}}/>}
+                    </li>
+                )
                 })}
             </ol>
         )    
@@ -76,7 +83,12 @@ export default function MapGraphics() {
         return(
             <ol>
                 {filteredAssets.map(ass => {
-                    return(<li key = {ass.label} className = 'character-box-clickable' onClick = {() => addToMap(ass)}>{ass.label}</li>)
+                    return(
+                    <li key = {ass.label} className = 'character-box-clickable' onClick = {() => addToMap(ass)}>
+                        {ass.label}
+                        {showPreview && <img src = {ass.url} style = {{'width': '50px', height: '50px'}}/>}
+                    </li>
+                )
                 })}
             </ol>
         )    

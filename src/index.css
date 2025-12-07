@@ -849,6 +849,15 @@ input.color-picker-color-box{
   display: flex;
 }
 
+.game-states-dialog{
+  width: 50vw;
+  height: 70vh;
+  background-image: url('./assets/graphics/characterBoxSmall.jpg');
+  background-size: cover;
+  border: 4px solid #372e24;
+  color: var(--main-text-color);
+}
+
 @media(max-width: 1800px){
   #character-info{
     max-height: 75vh;

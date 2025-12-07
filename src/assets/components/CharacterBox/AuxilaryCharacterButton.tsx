@@ -8,13 +8,14 @@ export default function AuxilaryCharacterButton({onClickEvent, label} : props) {
             case 'refresh': return (<>&#8635;</>)
             case 'gear': return (<>&#9881;</>)
             case 'question': return("?")
+            case 'disk': return(<>&#128190;</>);
         }
-        return '.'
+        return (<></>)
     }
 
 }
 
 type props = {
     onClickEvent: React.MouseEventHandler<HTMLButtonElement>
-    label: 'refresh' | 'gear' |'question'
+    label: 'refresh' | 'gear' |'question' | 'disk'
 }

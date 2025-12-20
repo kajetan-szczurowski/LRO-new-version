@@ -200,7 +200,7 @@ function handleRightClickOnInitiativeElement(map: mapType){
     if (map.mouseX < map.initiativeLeftDecoratorX || map.mouseX > map.initiativeRightDecoratorX) return;
     if (map.mouseY > map.initiativeYPosition + map.presets.INITIATIVE_ASSET_SIZE + 10) return;
     for (let i = 0; i < map.initiative.length; i++){
-        if (isMouseOnCharacter(map, map.initiative[i])) {
+        if (isMouseOnCharacter(map, map.initiative[i], true)) {
             map.controllFunction('change-active-initiative', [map.initiative[i].id]);
             return true;
         }

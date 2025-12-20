@@ -16,9 +16,9 @@ export function drawAll(map: mapType){
     drawMiniMap(map);
     drawCoordinates(map);
     drawPing(map);
-    drawAssetData(map);
     drawConditions(map);
     drawInitiative(map);
+    drawAssetData(map);
     drawContextMenu(map);
     drawFancyBorder(map);
     map.frameDrawing = false;
@@ -152,10 +152,11 @@ function drawAssetData(map: mapType){
     drawHP(map);
     if (!map.defencesText) return;
     const dataWidth = map.canvas.measureText(map.defencesText).width * 2;
-    const rectangleX = map.HPBarX - dataWidth / 2;
+    const canvasMiddle = map.rawCanvas.width / 2;
+    const rectangleX = canvasMiddle - dataWidth / 2;
     drawRectangle({canvasContext: map.canvas, x:rectangleX, y:30, width: dataWidth, height: 30, fillStyle: '#493f33'});
     drawRectangle({canvasContext: map.canvas, x: rectangleX, y: 30, width: dataWidth, height: 30, strokeStyle: 'black', lineWidth: 3});
-    writeText({canvasContext: map.canvas, x:map.HPBarX, y: 50, text: map.defencesText, textAlign: 'center',
+    writeText({canvasContext: map.canvas, x:canvasMiddle, y: 50, text: map.defencesText, textAlign: 'center',
     font: map.presets.COORDINATES_TEXT_FONT, fillStyle: map.presets.DISTANCE_FONT_FILL_STYLE, strokeStyle: map.presets.DISTANCE_FONT_STROKE_STYLE})
 }
 

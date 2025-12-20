@@ -23,9 +23,11 @@ export function handleCharacters(map:mapType){
     })
 }
 
-export function isMouseOnCharacter(map:mapType, character:characterType){
+export function isMouseOnCharacter(map:mapType, character:characterType, useOnlyVisibleCoordinates?: boolean){
     if(!character || !character.size) return;
-    const [x, y, lowX, lowY, bigX, bigY] = [map.absoluteMouseX, map.absoluteMouseY, character.x, character.y, character.x + character.size, character.y + character.size];
+    const x = useOnlyVisibleCoordinates? map.mouseX : map.absoluteMouseX;
+    const y = useOnlyVisibleCoordinates? map.mouseY: map.absoluteMouseY;
+    const [lowX, lowY, bigX, bigY] = [character.x, character.y, character.x + character.size, character.y + character.size];
     return x >= lowX && y >= lowY && x <= bigX && y <= bigY;
 }
 
